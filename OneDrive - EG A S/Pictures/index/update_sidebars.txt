@@ -1,0 +1,22 @@
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-header">Company</div>
+      <a class="sidebar-item" href="company-settings-mockup.html">General</a>
+      <a class="sidebar-item" href="roles-and-permissions-mockup.html">Roles & Permissions</a>
+      <a class="sidebar-item" href="service-tasks-mockup.html">Service Tasks</a>
+      <a class="sidebar-item" href="skills-mockup.html">Skills</a>
+      <a class="sidebar-item" href="equipment-mockup.html">Equipment</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Data</div>
+      <a class="sidebar-item" href="module-categories-mockup.html">Module Categories</a>
+      <a class="sidebar-item" href="imports-mockup.html">Imports</a>
+      <a class="sidebar-item" href="departments-mockup.html">Departments</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Admin</div>
+      <a class="sidebar-item" href="administrator-users-mockup.html">Administrator Users</a>
+      <a class="sidebar-item" href="integration-mockup.html">Integration</a>
+    </div>
+  </aside>

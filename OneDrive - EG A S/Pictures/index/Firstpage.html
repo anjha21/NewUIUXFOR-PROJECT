@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EG TraceTool — UI Redesign Mockups</title>
+  <style>
+    :root {
+      --accent: #BB5B2C;
+      --accent-dark: #9A4A22;
+      --accent-light: #F4E7DE;
+      --ink-900: #14161B;
+      --ink-700: #45505C;
+      --ink-500: #6B7280;
+      --border: #E4E1DD;
+      --bg-page: #FFFFFF;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--accent-light) 0%, #fff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 720px;
+      width: 100%;
+      background: var(--bg-page);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(31,36,48,.12);
+      padding: 48px 40px;
+    }
+    .header {
+      text-align: center; margin-bottom: 48px;
+    }
+    .logo {
+      width: 56px; height: 56px; border-radius: 12px; flex:none;
+      background: linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+      margin: 0 auto 16px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink-900);
+    }
+    .subtitle {
+      color: var(--ink-500);
+      font-size: 14px;
+      margin: 0;
+    }
+    .mockup-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .mockup-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .mockup-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 6px 16px rgba(187,91,44,.1);
+      transform: translateY(-1px);
+    }
+    .mockup-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex: none;
+    }
+    .mockup-info h3 {
+      margin: 0 0 4px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-900);
+    }
+    .mockup-info p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--ink-500);
+    }
+    .mockup-arrow {
+      margin-left: auto;
+      color: var(--ink-500);
+      font-size: 18px;
+      flex: none;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--ink-500);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo"></div>
+      <h1>EG TraceTool</h1>
+      <p class="subtitle">UI Redesign — Interactive Mockups</p>
+    </div>
+
+    <div class="mockup-grid">
+      <a class="mockup-card" href="login-mockup.html">
+        <div class="mockup-number">1</div>
+        <div class="mockup-info">
+          <h3>Login Page</h3>
+          <p>Split-screen with hero photo, User/Company tabs, SSO</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+
+      <a class="mockup-card" href="dashboard-mockup.html">
+        <div class="mockup-number">2</div>
+        <div class="mockup-info">
+          <h3>Frontpage Dashboard</h3>
+          <p>KPI summary tiles, 8 widget cards, fixed nav & sidebar</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+
+      <a class="mockup-card" href="equipment-mockup.html">
+        <div class="mockup-number">3</div>
+        <div class="mockup-info">
+          <h3>Equipment Search & List</h3>
+          <p>Icon sidebar, search toolbar, dense table with sticky columns</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+
+      <a class="mockup-card" href="create-equipment-step1.html">
+        <div class="mockup-number">4</div>
+        <div class="mockup-info">
+          <h3>Create Equipment — Step 1</h3>
+          <p>Equipment type selection (Unique / Multi / Consumable)</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+
+      <a class="mockup-card" href="create-equipment-form.html">
+        <div class="mockup-number">5</div>
+        <div class="mockup-info">
+          <h3>Create Equipment — Step 2</h3>
+          <p>Master data form with tabs, pictures panel, details</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+
+      <a class="mockup-card" href="company-settings-mockup.html">
+        <div class="mockup-number">6</div>
+        <div class="mockup-info">
+          <h3>Company Settings</h3>
+          <p>Sidebar navigation, tabbed interface, forms & tables, modern styling</p>
+        </div>
+        <div class="mockup-arrow">→</div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <p>© 2026 EG A/S — TraceTool UI Redesign</p>
+      <p>All mockups are interactive — click any item to navigate through the flow</p>
+    </div>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const sidebarItems = document.querySelectorAll(".sidebar-item[onclick]");
+  sidebarItems.forEach(item => {
+    item.addEventListener("click", function(e){
+      const onclickAttr = this.getAttribute("onclick");
+      if(onclickAttr </body></body> onclickAttr.includes("nav(")) {
+        const urlMatch = onclickAttr.match(/nav('([^']+)')/);
+        if(urlMatch </body></body> urlMatch[1]) {
+          const url = urlMatch[1];
+          window.location.href = url;
+        }
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

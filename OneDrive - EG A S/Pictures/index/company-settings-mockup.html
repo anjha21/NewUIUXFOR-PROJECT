@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EG TraceTool — Company Settings</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --bg-sidebar:#F5F4F2;
+    --bg-hover:#FAFAF8;
+    --card-bg:#F9F8F6;
+    --support-pink:#E8D5D0;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+
+  body{
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg-page);
+    color:var(--ink-900);
+    display:flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar{
+    width:200px;
+    background:var(--bg-sidebar);
+    border-right:1px solid var(--border);
+    padding:24px 0;
+    height:100vh;
+    overflow-y:auto;
+    flex:0 0 200px;
+  }
+
+  .sidebar-section{margin-bottom:24px;}
+
+  .sidebar-header{
+    padding:0 16px 24px;
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+
+  .sidebar-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 16px;
+    margin:0 8px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    color:var(--ink-700);
+    text-decoration:none;
+    transition:.15s ease;
+  }
+
+  .sidebar-item:hover{background:var(--bg-hover);}
+
+  .sidebar-item.active{
+    background:var(--accent-light);
+    color:var(--accent-dark);
+    font-weight:600;
+  }
+
+  /* MAIN */
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* TOP NAV */
+  .top-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    padding:0 24px;
+    height:50px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:700;
+    font-size:14px;
+  }
+
+  .logo-mark{
+    width:32px;
+    height:32px;
+    border-radius:6px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+
+  .logo-mark img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+
+  .close-btn{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink-500);
+    transition:.15s ease;
+    text-decoration:none;
+  }
+
+  .close-btn:hover{
+    border-color:var(--ink-400);
+    color:var(--ink-700);
+  }
+
+  /* CONTENT */
+  .content-wrapper{
+    flex:1;
+    overflow-y:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr 420px;
+    gap:20px;
+    padding:24px 24px;
+  }
+
+  .left-column, .right-column, .support-panel{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  /* CARD SECTION */
+  .section{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-900);
+    margin:0 0 12px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    letter-spacing:.01em;
+  }
+
+  .section-icon{
+    font-size:16px;
+    width:20px;
+    text-align:center;
+  }
+
+  .section-content{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .form-label{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-700);
+    letter-spacing:.01em;
+  }
+
+  .form-input, .form-select{
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink-900);
+    background:#fff;
+  }
+
+  .form-input:focus, .form-select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-light);
+  }
+
+  .form-hint{
+    font-size:10px;
+    color:var(--ink-400);
+    margin-top:2px;
+  }
+
+  .input-group{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  .input-group .form-input{flex:1;}
+
+  .btn{
+    padding:8px 12px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink-700);
+    transition:.15s ease;
+  }
+
+  .btn:hover{background:var(--bg-hover);}
+
+  .btn-block{
+    padding:9px 12px;
+    font-size:11px;
+    width:100%;
+    margin-top:6px;
+  }
+
+  .checkbox-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .checkbox-item{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:13px;
+    color:var(--ink-700);
+  }
+
+  .checkbox-item input{
+    width:14px;
+    height:14px;
+    margin-top:2px;
+    cursor:pointer;
+    accent-color:var(--accent);
+    flex-shrink:0;
+  }
+
+  .list-box{
+    border:1px solid var(--border);
+    border-radius:4px;
+    max-height:100px;
+    overflow-y:auto;
+    background:#fff;
+    font-size:11px;
+    color:var(--ink-700);
+  }
+
+  .list-item{
+    padding:6px 10px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .list-item:last-child{border-bottom:none;}
+
+  .field-list{
+    font-size:11px;
+    color:var(--ink-700);
+  }
+
+  .field-item{padding:3px 0;}
+
+  .tabs{
+    display:flex;
+    gap:4px;
+    margin-bottom:8px;
+  }
+
+  .tab{
+    flex:1;
+    padding:8px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink-700);
+    cursor:pointer;
+    border-radius:4px;
+    font-size:11px;
+    font-weight:600;
+    transition:.15s ease;
+  }
+
+  .tab.active{
+    background:var(--accent-light);
+    color:var(--accent-dark);
+    border-color:var(--accent);
+  }
+
+  /* STRIPE PATTERN */
+  .preview-box{
+    width:100%;
+    height:90px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    background:repeating-linear-gradient(
+      45deg,
+      #f5f4f2,
+      #f5f4f2 10px,
+      #ebe8e3 10px,
+      #ebe8e3 20px
+    );
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink-400);
+    font-size:12px;
+    margin-bottom:8px;
+  }
+
+  /* SUPPORT PANEL */
+  .support-panel{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:18px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .support-title{
+    font-size:14px;
+    font-weight:700;
+    color:var(--ink-900);
+    margin:0 0 16px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .support-icon{
+    font-size:18px;
+    color:#D4A5A0;
+  }
+
+  .support-field{
+    margin-bottom:16px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .support-label{
+    font-size:11px;
+    font-weight:700;
+    color:var(--ink-700);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+
+  .support-value{
+    font-size:13px;
+    color:var(--ink-900);
+    padding:10px 12px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:4px;
+    min-height:36px;
+    display:flex;
+    align-items:center;
+  }
+
+  /* ACTION BUTTON */
+  .btn-action{
+    width:100%;
+    padding:10px 12px;
+    background:#F0F5FF;
+    color:#0066CC;
+    border:1px solid #E0EBFF;
+    border-radius:4px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.15s ease;
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+
+  .btn-action:hover{
+    background:#E8F2FF;
+    border-color:#D0E3FF;
+  }
+
+  /* FOOTER */
+  .footer{
+    padding:16px 24px;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    background:#fff;
+  }
+
+  .btn-footer{
+    padding:8px 20px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    background:#fff;
+    color:var(--ink-700);
+    transition:.15s ease;
+  }
+
+  .btn-footer:hover{background:var(--bg-hover);}
+
+  .btn-footer.primary{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+  }
+
+  .btn-footer.primary:hover{
+    background:var(--accent-dark);
+  }
+</style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-header">COMPANY</div>
+      <a class="sidebar-item active" href="company-settings-mockup.html">General</a>
+      <a class="sidebar-item" href="roles-and-permissions-mockup.html">Roles & Permissions</a>
+      <a class="sidebar-item" href="service-tasks-mockup.html">Service Tasks</a>
+      <a class="sidebar-item" href="skills-mockup.html">Skills</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">DATA</div>
+      <a class="sidebar-item" href="module-categories-mockup.html">Module Categories</a>
+      <a class="sidebar-item" href="imports-mockup.html">Imports</a>
+      <a class="sidebar-item" href="departments-mockup.html">Departments</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">ADMIN</div>
+      <a class="sidebar-item" href="administrator-users-mockup.html">Administrator Users</a>
+      <a class="sidebar-item" href="integration-mockup.html">Integration</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top-nav">
+      <div class="brand">
+        <div class="logo-mark">
+          <img src="assets/logo.png" alt="EG TraceTool">
+        </div>
+        Company Settings
+      </div>
+      <a href="index.html" class="close-btn" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </a>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- LEFT COLUMN -->
+      <div class="left-column">
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">🏢</span>Company ID & Password</h3>
+          <div class="section-content">
+            <div class="form-group">
+              <label class="form-label">Company ID (Public)</label>
+              <div class="input-group">
+                <input type="text" class="form-input" value="EG-001" />
+                <button class="btn">✎ Edit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">👤</span>Default Role for New Users</h3>
+          <div class="section-content">
+            <div class="form-group">
+              <label class="form-label">Standard Role</label>
+              <select class="form-select">
+                <option>Employee (Read-only)</option>
+                <option>Manager</option>
+                <option>Administrator</option>
+              </select>
+            </div>
+            <div class="form-hint">Users created via import will be assigned this role.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">⚙️</span>Turnover Settings</h3>
+          <div class="section-content">
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" checked><span>New handout can end reservation</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>Prevent handout when service</span></label>
+              <label class="checkbox-item"><input type="checkbox" checked><span>Show warning during handout for overdue service</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>No expected hand-in date</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>Commodity handout as sold</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>Project work days default</span></label>
+              <label class="checkbox-item"><input type="checkbox" checked><span>Product item public ID as barcode</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>Booking actions only current day</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>No notification weekends</span></label>
+              <label class="checkbox-item"><input type="checkbox"><span>Service complete as default</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">📦</span>Storage Administration</h3>
+          <div class="section-content">
+            <div class="list-box">
+              <div class="list-item">* Hovedlager (system)</div>
+              <div class="list-item">Malerlager</div>
+              <div class="list-item">Mangalore</div>
+              <div class="list-item">India</div>
+            </div>
+            <button class="btn btn-block">+ Add Storage</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">📝</span>Custom Fields</h3>
+          <div class="section-content">
+            <div class="tabs">
+              <button class="tab active">Product Item</button>
+              <button class="tab">Package</button>
+            </div>
+            <div class="field-list">
+              <div class="field-item">#1 Field Name 1</div>
+              <div class="field-item">#2 Field Name 2</div>
+              <div class="field-item">#3 Field Name 3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-column">
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">🖼️</span>Company Logo</h3>
+          <div class="section-content">
+            <div class="preview-box">Company Logo</div>
+            <button class="btn btn-block">+ Upload Logo</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">#️⃣</span>Item Set ID</h3>
+          <div class="section-content">
+            <div class="form-group">
+              <label class="form-label">Next Product Item ID</label>
+              <input type="text" class="form-input" value="2350" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Next Package ID</label>
+              <input type="text" class="form-input" value="PYG-1001" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">🎨</span>Employee Card Design</h3>
+          <div class="section-content">
+            <div class="form-group">
+              <label class="form-label">Card Design Template</label>
+              <select class="form-select">
+                <option>Standard Design</option>
+              </select>
+            </div>
+            <div class="preview-box">Card Preview</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title"><span class="section-icon">💱</span>Currency Format</h3>
+          <div class="section-content">
+            <div class="form-group">
+              <select class="form-select">
+                <option>DKK (Danish Krone)</option>
+                <option>EUR (Euro)</option>
+                <option>USD (US Dollar)</option>
+              </select>
+            </div>
+            <div class="form-hint">Example: 1,234.56 DKK.</div>
+          </div>
+        </div>
+
+        <button class="btn-action">🔄 Clear & Resynchronize</button>
+      </div>
+
+      <!-- SUPPORT PANEL -->
+      <div class="support-panel">
+        <h3 class="support-title"><span class="support-icon">❤️</span>Support Settings</h3>
+        <div class="support-field">
+          <div class="support-label">Phone Label</div>
+          <div class="support-value">Support Phone</div>
+        </div>
+        <div class="support-field">
+          <div class="support-label">Phone Number</div>
+          <div class="support-value">+45 4040 4040</div>
+        </div>
+        <div class="support-field">
+          <div class="support-label">Email Label</div>
+          <div class="support-value">Support Email</div>
+        </div>
+        <div class="support-field">
+          <div class="support-label">Email Address</div>
+          <div class="support-value">support@company.dk</div>
+        </div>
+        <div class="support-field">
+          <div class="support-label">Support Information</div>
+          <div class="support-value">Available Monday-Friday 9:00-17:00 CET</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <button class="btn-footer">Cancel</button>
+      <button class="btn-footer primary">Save and close</button>
+    </div>
+  </div>
+
+<script>
+function updateActiveState() {
+  const currentFile = window.location.pathname.split('/').pop() || 'company-settings-mockup.html';
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.classList.remove('active');
+    const href = item.getAttribute('href');
+    if(href === currentFile) {
+      item.classList.add('active');
+    }
+  });
+}
+
+// Run on page load and on hash change
+document.addEventListener('DOMContentLoaded', updateActiveState);
+window.addEventListener('hashchange', updateActiveState);
+updateActiveState();
+</script>
+</body>
+</html>

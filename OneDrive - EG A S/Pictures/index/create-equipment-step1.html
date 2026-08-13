@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EG TraceTool — Create new equipment (Step 1)</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --bg-card:#FFFFFF;
+    --radius:12px;
+    --radius-sm:6px;
+    --shadow-card:0 1px 2px rgba(31,36,48,.04), 0 1px 1px rgba(31,36,48,.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'Segoe UI', Roboto, Arial, sans-serif; background:var(--bg-page); color:var(--ink-900); font-size:14px;}
+  a{color:inherit;}
+  svg{display:block;}
+
+  .top-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff; border-bottom:1px solid var(--border); padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; cursor:pointer;}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;flex:none;
+    background:url('assets/logo.png') center/cover no-repeat, linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+  }
+  .close-btn{
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--ink-500);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .close-btn:hover{border-color:var(--ink-400); color:var(--ink-700);}
+
+  .steps{display:flex; align-items:center; gap:8px;}
+  .step-dot{
+    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700; color:#fff; background:var(--accent);
+  }
+  .step-dot.pending{background:var(--border); color:var(--ink-500);}
+  .step-line{width:28px;height:2px;background:var(--border);}
+
+  .wizard{max-width:820px; margin:0 auto; padding:56px 24px;}
+  .wizard h1{font-size:22px; margin:0 0 8px; font-weight:700;}
+  .wizard p.sub{color:var(--ink-500); font-size:13.5px; margin:0 0 32px;}
+
+  .option-card{
+    display:flex; align-items:stretch; gap:0; background:#fff; border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow-card); margin-bottom:16px; cursor:pointer;
+    overflow:hidden; transition:border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  }
+  .option-card:hover{border-color:var(--accent); box-shadow:0 6px 16px rgba(31,36,48,.08); transform:translateY(-1px);}
+  .option-icon{
+    flex:none; width:110px; display:flex; align-items:center; justify-content:center;
+    background:var(--accent-light); color:var(--accent-dark);
+  }
+  .option-body{flex:1; padding:20px 22px; display:flex; flex-direction:column; gap:6px;}
+  .option-title{display:flex; align-items:center; gap:10px; font-size:15px; font-weight:700; color:var(--ink-900);}
+  .option-badge{
+    width:22px;height:22px;border-radius:50%;background:var(--ink-900); color:#fff;
+    display:flex;align-items:center;justify-content:center; font-size:11px; font-weight:700; flex:none;
+  }
+  .option-desc{font-size:13px; color:var(--ink-500); line-height:1.55; max-width:560px;}
+  .option-arrow{flex:none; width:44px; display:flex; align-items:center; justify-content:center; color:var(--ink-400);}
+  .option-card:hover .option-arrow{color:var(--accent);}
+
+  .wizard-hint{text-align:center; color:var(--ink-400); font-size:13px; margin-top:28px;}
+</style>
+</head>
+<body>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // Close button
+  document.querySelector('.close-btn')?.addEventListener('click', function(){
+  });
+
+  // Brand navigation
+  document.querySelector('.brand')?.addEventListener('click', function(){
+  });
+
+  // Option cards
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', function(){
+    });
+  });
+});
+</script>
+
+  <div class="top-bar">
+    <div class="brand" onclick="window.location.href='equipment-mockup.html'">
+      <div class="logo-mark"></div>
+      EG TraceTool
+    </div>
+    <div class="steps">
+      <div class="step-dot">1</div>
+      <div class="step-line"></div>
+      <div class="step-dot pending">2</div>
+    </div>
+    <div class="close-btn" title="Close" onclick="window.location.href='equipment-mockup.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </div>
+  </div>
+
+  <div class="wizard">
+    <h1>Welcome to 'Create new equipment' — Step 1</h1>
+    <p class="sub">Choose how this equipment should be tracked. You can change this later from equipment settings.</p>
+
+    <div class="option-card" onclick="window.location.href='create-equipment-form.html?type=unique'">
+      <div class="option-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 4v16"/></svg>
+      </div>
+      <div class="option-body">
+        <div class="option-title"><span class="option-badge">A</span> Create your equipment as a unique equipment</div>
+        <div class="option-desc">Click here if you want to create equipment as a unique item with its own product number and barcode, which can be followed and managed individually in the calendar function.</div>
+      </div>
+      <div class="option-arrow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+
+    <div class="option-card" onclick="window.location.href='create-equipment-form.html?type=multi'">
+      <div class="option-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 7V5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+      </div>
+      <div class="option-body">
+        <div class="option-title"><span class="option-badge">B</span> Create your equipment as a multi-equipment</div>
+        <div class="option-desc">Click here if you want to create your equipment as a so-called multitool, for which there is no need to know the unique product numbers and barcodes — you just need to know if there is a specific number of these items available. Mostly used for equipment that is likely to return to the warehouse after a hand-out.</div>
+      </div>
+      <div class="option-arrow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+
+    <div class="option-card" onclick="window.location.href='create-equipment-form.html?type=consumable'">
+      <div class="option-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l3 5H9l3-5z"/><rect x="6" y="8" width="12" height="13" rx="2"/></svg>
+      </div>
+      <div class="option-body">
+        <div class="option-title"><span class="option-badge">C</span> Create your equipment as a consumable</div>
+        <div class="option-desc">Click here if you want to create equipment as a consumable, i.e. goods that are not expected to return to the warehouse after hand-out. Commonly used for petrol, abrasive paper, nails, screws and other consumables.</div>
+      </div>
+      <div class="option-arrow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+
+    <p class="wizard-hint">Click on one of the options above to continue…</p>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const sidebarItems = document.querySelectorAll(".sidebar-item[onclick]");
+  sidebarItems.forEach(item => {
+    item.addEventListener("click", function(e){
+      const onclickAttr = this.getAttribute("onclick");
+      if(onclickAttr </body></body> onclickAttr.includes("nav(")) {
+        const urlMatch = onclickAttr.match(/nav('([^']+)')/);
+        if(urlMatch </body></body> urlMatch[1]) {
+          const url = urlMatch[1];
+          window.location.href = url;
+        }
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

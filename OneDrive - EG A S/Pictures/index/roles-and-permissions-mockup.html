@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EG TraceTool — Roles & Permissions (Redesign)</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --bg-sidebar:#F5F4F2;
+    --bg-hover:#FAFAF8;
+    --radius:10px;
+    --radius-sm:6px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg-page);
+    color:var(--ink-900);
+    display:flex;
+  }
+
+  /* --- Sidebar Navigation --- */
+  .sidebar{
+    width:200px;
+    background:var(--bg-sidebar);
+    border-right:1px solid var(--border);
+    padding:24px 0;
+    height:100vh;
+    overflow-y:auto;
+    flex:0 0 200px;
+  }
+  .sidebar-header{
+    padding:0 16px 24px;
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .sidebar-section{margin-bottom:24px;}
+  .sidebar-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 16px;
+    margin:0 8px;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-size:13px;
+    color:var(--ink-700);
+    text-decoration:none;
+    transition:.15s ease;
+  }
+  .sidebar-item:hover{
+    background:var(--bg-hover);
+    color:var(--ink-900);
+  }
+  .sidebar-item.active{
+    background:var(--accent-light);
+    color:var(--accent-dark);
+    font-weight:600;
+  }
+
+  /* --- Main Content --- */
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* --- Top Navigation Bar --- */
+  .top-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+  .logo-mark{
+    width:32px;height:32px;border-radius:6px;flex:none;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .logo-mark svg{
+    width:24px;
+    height:24px;
+  }
+  .close-btn{
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--border);
+    background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-500); transition:.15s ease;
+  }
+  .close-btn:hover{border-color:var(--ink-400); color:var(--ink-700);}
+
+  /* --- Content Area --- */
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:24px 32px;
+  }
+
+  /* --- Form Grid --- */
+  .form-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:18px;
+  }
+  .form-grid.full{
+    grid-template-columns:1fr;
+  }
+
+  /* --- Form Field --- */
+  .form-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field-label{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-700);
+    letter-spacing:.01em;
+  }
+  .field-input, .field-select{
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink-900);
+    background:#fff;
+    transition:.15s ease;
+  }
+  .field-input:focus, .field-select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-light);
+  }
+
+  /* --- Info Box --- */
+  .info-box{
+    background:#fef2f0;
+    border:1px solid #f5d4cc;
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    margin-bottom:24px;
+    font-size:13px;
+    color:var(--ink-900);
+  }
+  .info-box strong{font-weight:600;}
+
+  /* --- Role Selector Section --- */
+  .role-selector-section{
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+  }
+  .role-selector-section .form-field{
+    flex:0 1 200px;
+  }
+  .role-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  /* --- Buttons --- */
+  .btn{
+    padding:10px 16px;
+    border:none;
+    border-radius:var(--radius-sm);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.15s ease;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{
+    background:var(--accent-dark);
+  }
+  .btn-secondary{
+    background:#fff;
+    color:var(--ink-700);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover{
+    background:var(--bg-hover);
+    border-color:var(--ink-400);
+  }
+
+  /* --- Permission Cards --- */
+  .permissions-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(380px, 1fr));
+    gap:24px;
+    margin-bottom:32px;
+  }
+
+  .permission-card{
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    background:#fff;
+  }
+
+  .permission-card-header{
+    background:var(--bg-hover);
+    padding:16px 16px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .permission-card-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-900);
+    margin:0;
+    padding:0;
+  }
+
+  .permission-card-body{
+    padding:16px;
+  }
+
+  .permission-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .permission-item{
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    font-size:13px;
+    color:var(--ink-700);
+  }
+
+  .permission-item input[type="checkbox"]{
+    width:15px;
+    height:15px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    margin-top:3px;
+    flex:none;
+  }
+
+  .permission-item label{
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex:1;
+  }
+
+  .pro-badge{
+    background:var(--accent-light);
+    color:var(--accent-dark);
+    font-size:10px;
+    font-weight:700;
+    padding:2px 6px;
+    border-radius:3px;
+    flex:none;
+    white-space:nowrap;
+  }
+
+  /* --- Department Section --- */
+  .dept-section{
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid var(--border);
+  }
+
+  .dept-section-title{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-bottom:12px;
+  }
+
+  .dept-control{
+    margin-bottom:14px;
+  }
+
+  .dept-control label{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-700);
+    margin-bottom:6px;
+    display:block;
+  }
+
+  .dept-control select{
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink-900);
+    background:#fff;
+    width:100%;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+
+  .dept-control select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-light);
+  }
+
+  /* --- Checkbox --- */
+  .checkbox-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .checkbox-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    color:var(--ink-700);
+  }
+  .checkbox-item input{
+    width:15px;
+    height:15px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+
+  /* --- Action Buttons --- */
+  .action-buttons{
+    display:flex;
+    gap:12px;
+    margin-top:32px;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+  }
+
+  .action-buttons .btn{
+    min-width:140px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-header">Company</div>
+      <a class="sidebar-item" href="company-settings-mockup.html">General</a>
+      <a class="sidebar-item" href="roles-and-permissions-mockup.html">Roles & Permissions</a>
+      <a class="sidebar-item" href="service-tasks-mockup.html">Service Tasks</a>
+      <a class="sidebar-item" href="skills-mockup.html">Skills</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Data</div>
+      <a class="sidebar-item" href="module-categories-mockup.html">Module Categories</a>
+      <a class="sidebar-item" href="imports-mockup.html">Imports</a>
+      <a class="sidebar-item" href="departments-mockup.html">Departments</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Admin</div>
+      <a class="sidebar-item" href="administrator-users-mockup.html">Administrator Users</a>
+      <a class="sidebar-item" href="integration-mockup.html">Integration</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Header -->
+    <div class="top-nav">
+      <div class="brand">
+        <div class="logo-mark">
+          <img src="assets/logo.png" alt="EG TraceTool" style="width:100%; height:100%; object-fit:contain;">
+        </div>
+        Roles & Permissions
+      </div>
+      <a href="index.html" class="close-btn" title="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <strong>(PRO) Pro tier permissions are tied to the role "Administrator"</strong>
+      </div>
+
+      <!-- Role Selector & Actions -->
+      <div class="role-selector-section">
+        <div class="form-field">
+          <label class="field-label">Select role</label>
+          <select class="field-select" id="roleSelect">
+            <option value="admin">Administrator</option>
+            <option value="manager">Manager</option>
+            <option value="employee">Employee</option>
+            <option value="viewonly">View Only</option>
+          </select>
+        </div>
+        <div class="role-actions">
+          <button class="btn btn-secondary" onclick="editRole()">✎ Edit role</a>
+          <button class="btn btn-secondary" onclick="copyRole()">⧉ Copy role</a>
+          <button class="btn btn-secondary" onclick="deleteRole()">✕ Delete role</a>
+          <button class="btn btn-primary" onclick="createNewRole()">+ Create new role</a>
+        </div>
+      </div>
+
+      <!-- Permission Cards -->
+      <div class="permissions-grid">
+
+        <!-- General & Dashboards Card -->
+        <div class="permission-card">
+          <div class="permission-card-header">
+            <h3 class="permission-card-title">General</h3>
+          </div>
+          <div class="permission-card-body">
+            <div class="permission-list">
+              <div class="permission-item">
+                <input type="checkbox" id="perm-manage-depts" checked />
+                <label for="perm-manage-depts">Manage departments <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-service" checked />
+                <label for="perm-create-service">Create service assignments <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-general-settings" checked />
+                <label for="perm-general-settings">General settings <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-skills" checked />
+                <label for="perm-skills">Skills and permissions <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-skills-mgmt" checked />
+                <label for="perm-skills-mgmt">Skills management <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-import-emp" checked />
+                <label for="perm-import-emp">Import employees <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-manage-users" checked />
+                <label for="perm-manage-users">Manage users <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-out-handled" />
+                <label for="perm-hand-out-handled">Hand out of already handled out equipments/modules</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-order-lists" />
+                <label for="perm-see-order-lists">See order lists</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-edit-order" />
+                <label for="perm-create-edit-order">Create/Edit order lists</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-reports" />
+                <label for="perm-see-reports">See reports</label>
+              </div>
+            </div>
+
+            <!-- Dashboards subsection -->
+            <div class="dept-section">
+              <div class="dept-section-title">Dashboards</div>
+              <div class="permission-list">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards" checked />
+                  <label for="perm-view-dashboards">My equipments</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-status" checked />
+                  <label for="perm-view-dashboards-status">Weekly activity</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-extended" checked />
+                  <label for="perm-view-dashboards-extended">Extended service equipments</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-company" />
+                  <label for="perm-view-dashboards-company">Extended service equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-sp" />
+                  <label for="perm-view-dashboards-sp">Extended service equipment (special)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-sp-comp" />
+                  <label for="perm-view-dashboards-sp-comp">Extended service module (comparing)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-sp-personal" />
+                  <label for="perm-view-dashboards-sp-personal">Extended service module (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-skills" />
+                  <label for="perm-view-dashboards-skills">Skills with extended interval</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-all-activity" checked />
+                  <label for="perm-view-dashboards-all-activity">All activity</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-dept-activity" checked />
+                  <label for="perm-view-dashboards-dept-activity">All activity (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-equipment-stock" checked />
+                  <label for="perm-view-dashboards-equipment-stock">Equipment reached minimum stock</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-view-dashboards-service-overdue" checked />
+                  <label for="perm-view-dashboards-service-overdue">Items with exceeded handling date</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Equipment Card -->
+        <div class="permission-card">
+          <div class="permission-card-header">
+            <h3 class="permission-card-title">Equipment</h3>
+          </div>
+          <div class="permission-card-body">
+            <div class="permission-list">
+              <div class="permission-item">
+                <input type="checkbox" id="perm-view-equip" checked />
+                <label for="perm-view-equip">Create equipments</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-edit-equip" checked />
+                <label for="perm-edit-equip">Edit equipment <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-equip" />
+                <label for="perm-delete-equip">Edit custom fields (Pro)</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-equip-confirm" />
+                <label for="perm-delete-equip-confirm">Delete equipments</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-handout-equip" checked />
+                <label for="perm-handout-equip">Manage equipments</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-structure-mk-missing" />
+                <label for="perm-structure-mk-missing">Structure/Mark as missing</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-perform-repair" />
+                <label for="perm-create-perform-repair">Create/perform repair</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-not-equip" />
+                <label for="perm-hand-not-equip">Hand not equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-in-equip" checked />
+                <label for="perm-hand-in-equip">Hand in equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-equip" />
+                <label for="perm-see-equip">See equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-perform-service" />
+                <label for="perm-perform-service">Perform service</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-return-calibration" />
+                <label for="perm-return-calibration">Return calibration</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-search-equip" checked />
+                <label for="perm-search-equip">Search equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-purchase-price" />
+                <label for="perm-see-purchase-price">See purchase price</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-custom-fields" />
+                <label for="perm-see-custom-fields">See custom fields</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-calendar" />
+                <label for="perm-see-calendar">See calendar</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-service-tasks" />
+                <label for="perm-see-service-tasks">See service tasks</label>
+              </div>
+            </div>
+
+            <!-- Department Level Equipment -->
+            <div class="dept-section">
+              <div class="dept-section-title">Equipment (Department Level)</div>
+              <div class="dept-control">
+                <label>Own department</label>
+                <select>
+                  <option>Own department</option>
+                  <option>All departments</option>
+                </select>
+              </div>
+              <div class="permission-list">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-equip-dept" />
+                  <label for="perm-create-equip-dept">Create equipment (department) <span class="pro-badge">Pro</span></label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-edit-equip-dept" />
+                  <label for="perm-edit-equip-dept">Edit equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-delete-equip-dept" />
+                  <label for="perm-delete-equip-dept">Delete equipments (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-manage-equip-dept" />
+                  <label for="perm-manage-equip-dept">Manage equipments (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-structure-mk-dept" />
+                  <label for="perm-structure-mk-dept">Structure/Mark as missing (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-repair-dept" />
+                  <label for="perm-create-repair-dept">Create/perform repair (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-hand-not-dept" />
+                  <label for="perm-hand-not-dept">Hand not equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-hand-in-dept" />
+                  <label for="perm-hand-in-dept">Hand in equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-see-equip-dept" />
+                  <label for="perm-see-equip-dept">See equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-service-dept" />
+                  <label for="perm-service-dept">Service (department)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modules Card -->
+        <div class="permission-card">
+          <div class="permission-card-header">
+            <h3 class="permission-card-title">Modules</h3>
+          </div>
+          <div class="permission-card-body">
+            <div class="permission-list">
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-modules" />
+                <label for="perm-create-modules">Create module <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-edit-modules" checked />
+                <label for="perm-edit-modules">Edit modules <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-modules" />
+                <label for="perm-delete-modules">Delete module <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-edit-custom-module" />
+                <label for="perm-edit-custom-module">Edit custom fields (Pro)</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-manage-economy-module" checked />
+                <label for="perm-manage-economy-module">Manage equipments</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-structure-mk-module" />
+                <label for="perm-structure-mk-module">Structure/Mark as missing</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-perform-repair-module" />
+                <label for="perm-create-perform-repair-module">Create/perform repair</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-not-module" />
+                <label for="perm-hand-not-module">Hand not equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-in-module" checked />
+                <label for="perm-hand-in-module">Hand in equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-module" />
+                <label for="perm-see-module">See module</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-search-modules" checked />
+                <label for="perm-search-modules">Search modules</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-perform-repair-service" />
+                <label for="perm-create-perform-repair-service">Create/perform repair (service)</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-over-equipment" />
+                <label for="perm-hand-over-equipment">Hand over equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-out-module" />
+                <label for="perm-hand-out-module">Hand out equipment</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-purchase-price-module" />
+                <label for="perm-see-purchase-price-module">See purchase price</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-custom-fields-module" />
+                <label for="perm-see-custom-fields-module">See custom fields</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-add-preparation-module" />
+                <label for="perm-add-preparation-module">Add to preparation/maintenance</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-hand-over-module" />
+                <label for="perm-hand-over-module">Hand over equipment</label>
+              </div>
+            </div>
+
+            <!-- Department Level Modules -->
+            <div class="dept-section">
+              <div class="dept-section-title">Modules (Department Level)</div>
+              <div class="dept-control">
+                <label>Own department</label>
+                <select>
+                  <option>Own department</option>
+                  <option>All departments</option>
+                </select>
+              </div>
+              <div class="permission-list">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-module-dept" />
+                  <label for="perm-create-module-dept">Create module (department) <span class="pro-badge">Pro</span></label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-edit-modules-dept" />
+                  <label for="perm-edit-modules-dept">Edit modules (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-delete-modules-dept" />
+                  <label for="perm-delete-modules-dept">Delete module (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-edit-custom-fields-module-dept" />
+                  <label for="perm-edit-custom-fields-module-dept">Edit custom fields (department) (Pro)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-manage-equipments-dept" />
+                  <label for="perm-manage-equipments-dept">Manage equipments (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-structure-mk-department" />
+                  <label for="perm-structure-mk-department">Structure/Mark as missing (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-perform-repair-service-dept" />
+                  <label for="perm-create-perform-repair-service-dept">Create/perform repair (service) (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-hand-not-dept-module" />
+                  <label for="perm-hand-not-dept-module">Hand not equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-hand-in-module-dept" />
+                  <label for="perm-hand-in-module-dept">Hand in equipment (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-see-module-dept" />
+                  <label for="perm-see-module-dept">See module (department)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Card -->
+        <div class="permission-card">
+          <div class="permission-card-header">
+            <h3 class="permission-card-title">Projects</h3>
+          </div>
+          <div class="permission-card-body">
+            <div class="permission-list">
+              <div class="permission-item">
+                <input type="checkbox" id="perm-create-projects" />
+                <label for="perm-create-projects">Create projects <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-edit-projects" checked />
+                <label for="perm-edit-projects">Edit projects <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-projects" />
+                <label for="perm-delete-projects">Delete projects <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-creative-economy-report" checked />
+                <label for="perm-creative-economy-report">Creative economy report <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-search-projects" />
+                <label for="perm-search-projects">Search projects</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-view-projects" />
+                <label for="perm-view-projects">View projects</label>
+              </div>
+            </div>
+
+            <!-- Department Level Projects -->
+            <div class="dept-section">
+              <div class="dept-section-title">Projects (Department Level)</div>
+              <div class="dept-control">
+                <label>Own department</label>
+                <select>
+                  <option>Own department</option>
+                  <option>All departments</option>
+                </select>
+              </div>
+              <div class="permission-list">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-projects-dept" />
+                  <label for="perm-create-projects-dept">Create projects (department) <span class="pro-badge">Pro</span></label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-edit-projects-dept" />
+                  <label for="perm-edit-projects-dept">Edit projects (department) (Pro)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-delete-projects-dept" />
+                  <label for="perm-delete-projects-dept">Delete projects (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-creative-economy-report-dept" />
+                  <label for="perm-creative-economy-report-dept">Creative economy report (department) (Pro)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-search-projects-dept" />
+                  <label for="perm-search-projects-dept">Search projects (department)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Employees Card -->
+        <div class="permission-card">
+          <div class="permission-card-header">
+            <h3 class="permission-card-title">Employees</h3>
+          </div>
+          <div class="permission-card-body">
+            <div class="permission-list">
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-employee-documents" />
+                <label for="perm-see-employee-documents">See employee documents <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-employees" />
+                <label for="perm-delete-employees">Delete employees <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-creative-economy-emp" checked />
+                <label for="perm-creative-economy-emp">Create employee <span class="pro-badge">Pro</span></label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-employee-skills" checked />
+                <label for="perm-see-employee-skills">See employee skills</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-delete-employees-action" />
+                <label for="perm-delete-employees-action">Deactivate employees</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-see-employee" />
+                <label for="perm-see-employee">See employee</label>
+              </div>
+              <div class="permission-item">
+                <input type="checkbox" id="perm-search-employee" checked />
+                <label for="perm-search-employee">Search employee</label>
+              </div>
+            </div>
+
+            <!-- Department Level Employees -->
+            <div class="dept-section">
+              <div class="dept-section-title">Employees (Department Level)</div>
+              <div class="dept-control">
+                <label>Own department</label>
+                <select>
+                  <option>Own department</option>
+                  <option>All departments</option>
+                </select>
+              </div>
+              <div class="permission-list">
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-see-employee-documents-dept" />
+                  <label for="perm-see-employee-documents-dept">See employee documents (department) <span class="pro-badge">Pro</span></label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-delete-employees-dept" />
+                  <label for="perm-delete-employees-dept">Delete employees (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-create-employee-dept" />
+                  <label for="perm-create-employee-dept">Create employee (department) (Pro)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-see-employee-skills-dept" />
+                  <label for="perm-see-employee-skills-dept">See employee skills (department) (Pro)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-deactivate-employees-dept" />
+                  <label for="perm-deactivate-employees-dept">Deactivate employees (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-see-employees-dept" />
+                  <label for="perm-see-employees-dept">See employees (department)</label>
+                </div>
+                <div class="permission-item">
+                  <input type="checkbox" id="perm-search-employee-dept" />
+                  <label for="perm-search-employee-dept">Search employee (department)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveChanges()">💾 Save Changes</a>
+        <button class="btn btn-secondary" onclick="cancelChanges()">✕ Cancel</a>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // Role selector change
+  document.getElementById('roleSelect').addEventListener('change', function(){
+    console.log(`Role selected: ${this.value}`);
+  });
+
+  // Checkbox interactions
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function(){
+      const label = this.nextElementSibling?.textContent || 'Permission';
+      console.log(`${label.trim()}: ${this.checked ? 'Enabled' : 'Disabled'}`);
+    });
+  });
+});
+
+function editRole(){
+  }
+
+function copyRole(){
+  }
+
+function deleteRole(){
+  }
+
+function createNewRole(){
+  }
+
+function saveChanges(){
+  }
+
+function cancelChanges(){
+  }
+</script>
+
+
+<script>
+// Sidebar navigation - update active state
+const currentFile = window.location.pathname.split('/').pop();
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  const href = item.getAttribute('href');
+  if(href === currentFile) {
+    item.classList.add('active');
+  } else {
+    item.classList.remove('active');
+  }
+});
+</script>
+
+</body>
+</html>
+

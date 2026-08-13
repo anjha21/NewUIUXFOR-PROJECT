@@ -1,0 +1,18 @@
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const sidebarItems = document.querySelectorAll('.sidebar-item[onclick]');
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', function(e){
+      const onclickAttr = this.getAttribute('onclick');
+      if(onclickAttr && onclickAttr.includes('nav(')) {
+        const urlMatch = onclickAttr.match(/nav\('([^']+)'\)/);
+        if(urlMatch && urlMatch[1]) {
+          const url = urlMatch[1];
+          console.log('Navigating to:', url);
+          window.location.href = url;
+        }
+      }
+    });
+  });
+});
+</script>
