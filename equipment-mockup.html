@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EG TraceTool — Equipment (Redesign Mockup)</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --hover-bg:#F5F4F2;
+    --bg-card:#FFFFFF;
+    --success:#2E8B57;
+    --success-bg:#E7F5EC;
+    --warn:#B7791F;
+    --warn-bg:#FBF1DD;
+    --danger:#C0392B;
+    --danger-bg:#FBEAEA;
+    --radius:10px;
+    --radius-sm:6px;
+    --shadow-card:0 1px 2px rgba(31,36,48,.04), 0 1px 1px rgba(31,36,48,.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;overflow:hidden;}
+  body{font-family:'Segoe UI', Roboto, Arial, sans-serif; background:var(--bg-page); color:var(--ink-900); font-size:13.5px; display:flex; flex-direction:column;}
+  a{color:inherit;}
+  svg{display:block;}
+  button{font-family:inherit;}
+
+  /* ---------------- Top nav (shared shell) ---------------- */
+  .top-nav{
+    display:flex; align-items:center; gap:28px; flex:none;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; cursor:pointer;}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;flex:none;
+    background:url('assets/logo.png') center/cover no-repeat, linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+  }
+  .nav-tabs{display:flex; gap:4px; height:100%;}
+  .nav-tab{
+    display:flex;align-items:center;height:100%;padding:0 14px;
+    font-size:13.5px; font-weight:600; color:var(--ink-500); border-bottom:2px solid transparent;
+    cursor:pointer;
+  }
+  .nav-tab.active{color:var(--ink-900); border-bottom-color:var(--accent);}
+  .top-nav-right{margin-left:auto; display:flex; align-items:center; gap:18px;}
+  .nav-icon-btn{position:relative; color:var(--ink-500); cursor:pointer;}
+  .nav-badge{
+    position:absolute; top:-6px; right:-8px; background:var(--accent); color:#fff;
+    font-size:10px; font-weight:700; border-radius:8px; padding:1px 5px; line-height:1.3;
+  }
+  .user-chip{display:flex; align-items:center; gap:8px; padding-left:14px; border-left:1px solid var(--border); cursor:pointer;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-light); color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px; flex:none;}
+  .user-chip .name{font-size:13px;font-weight:600;}
+
+  /* ---------------- Layout ---------------- */
+  .layout{display:flex; align-items:stretch; flex:1; min-height:0;}
+
+  /* icon sidebar — compact icon-rail, every item is icon-tile + label, same anatomy throughout */
+  .icon-sidebar{
+    width:116px; flex:none; background:#fff; border-right:1px solid var(--border);
+    padding:18px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; overflow-y:auto;
+  }
+  .icon-nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:5px; padding:6px 2px;
+    border-radius:var(--radius-sm); cursor:pointer; text-align:center; width:100%;
+  }
+  .icon-nav-item .icon-tile{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-500);
+    transition:background .12s ease, color .12s ease;
+  }
+  .icon-nav-item .label{font-size:10.5px; font-weight:600; color:var(--ink-700); line-height:1.2;}
+  .icon-nav-item:hover .icon-tile{background:var(--hover-bg);}
+  .icon-nav-item.active .icon-tile{background:var(--accent-light); color:var(--accent-dark);}
+  .icon-nav-item.active .label{color:var(--accent-dark);}
+
+  .create-btn{
+    display:flex; flex-direction:column; align-items:center; gap:5px; width:100%;
+    background:none; border:none; cursor:pointer; padding:6px 2px 2px; margin-top:6px;
+  }
+  .create-btn .icon-tile{
+    width:36px; height:36px; border-radius:10px; flex:none; background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center; transition:background .12s ease;
+  }
+  .create-btn:hover .icon-tile{background:var(--accent-dark);}
+  .create-btn .label{font-size:10.5px; font-weight:700; color:var(--accent-dark); line-height:1.2;}
+
+  .icon-sidebar-spacer{flex:1;}
+  .icon-sidebar-footer{
+    width:100%; border-top:1px solid var(--border); padding-top:14px; margin-top:10px;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .side-btn{
+    width:100%; border:1px solid var(--border); background:#fff; border-radius:var(--radius-sm);
+    padding:7px 6px; font-size:10px; font-weight:600; color:var(--ink-700); text-align:center; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .new-badge{background:var(--accent); color:#fff; font-size:9px; font-weight:700; border-radius:8px; padding:1px 6px;}
+
+  /* content area */
+  .content-area{flex:1; min-width:0; display:flex; flex-direction:column; min-height:0;}
+  .content-header{position:relative; flex:none; padding:20px 24px 14px; border-bottom:1px solid var(--border); background:#fff;}
+  .content-header h1{font-size:19px; margin:0 0 14px;}
+  .toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .search-box{
+    display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:8px 12px; flex:1; min-width:220px; max-width:420px;
+  }
+  .search-box svg{color:var(--ink-400); flex:none;}
+  .search-box input{border:none;outline:none;font-size:13px;width:100%;font-family:inherit;color:var(--ink-900);}
+  .search-box .clear-btn{color:var(--ink-400); cursor:pointer;}
+  .tbtn{
+    display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:8px 12px; font-size:12.5px; font-weight:600; color:var(--ink-700); cursor:pointer;
+  }
+  .tbtn:hover{border-color:var(--ink-400);}
+  .tbtn.icon-only{padding:8px;}
+  .segmented{display:flex; border:1px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;}
+  .segmented .seg{padding:8px 10px; cursor:pointer; color:var(--ink-500); background:#fff;}
+  .segmented .seg.active{background:var(--accent); color:#fff;}
+  .toolbar-spacer{flex:1;}
+  .tbtn .chevron{transition:transform .15s ease;}
+  .tbtn.open .chevron{transform:rotate(180deg);}
+
+  /* filter panel — floating popover, anchored under the toolbar, never pushes the table */
+  .filter-panel{
+    display:none; position:absolute; top:calc(100% + 6px); left:24px; z-index:40;
+    width:760px; max-width:calc(100% - 48px); padding:20px 22px 22px;
+    background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 16px 32px rgba(31,36,48,.16);
+  }
+  .filter-panel.open{display:block;}
+  .filter-grid{display:grid; grid-template-columns:140px 1fr 140px 1fr; gap:12px 24px; align-items:center;}
+  .filter-grid label{font-size:12.5px; font-weight:600; color:var(--ink-700);}
+  .filter-field{position:relative;}
+  .filter-field select, .filter-field input[type=text]{
+    width:100%; border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:8px 30px 8px 10px; font-size:12.5px; color:var(--ink-900); background:#fff; font-family:inherit; appearance:none;
+  }
+  .filter-field svg{position:absolute; right:9px; top:50%; transform:translateY(-50%); color:var(--ink-400); pointer-events:none;}
+  .filter-created-row{grid-column:1 / -1; display:flex; align-items:center; gap:28px; margin-top:4px;}
+  .filter-check{display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--ink-700);}
+  .filter-check input{width:15px;height:15px;accent-color:var(--accent);}
+  .date-field{display:flex; align-items:center; gap:8px;}
+  .date-field .date-tag{font-size:10.5px; font-weight:700; color:var(--ink-500); text-transform:uppercase; letter-spacing:.03em;}
+  .date-field .filter-field{width:150px;}
+  .filter-divider{border-top:1px solid var(--border); margin:18px 0;}
+  .filter-footer{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;}
+  .filter-footer-buttons{display:flex; gap:10px;}
+  .filter-footer-buttons .tbtn{padding:9px 16px;}
+  .filter-footer-right{display:grid; grid-template-columns:auto 220px; gap:10px 14px; align-items:center;}
+  .filter-footer-right label{font-size:12.5px; font-weight:600; color:var(--ink-700); white-space:nowrap;}
+
+  /* table */
+  .table-scroll{flex:1; overflow:auto; background:#fff;}
+  table{border-collapse:collapse; width:max-content; min-width:100%;}
+  thead th{
+    position:sticky; top:0; z-index:2;
+    text-align:left; font-size:10.5px; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--ink-500); font-weight:700; padding:10px 14px; background:#FAF9F7;
+    border-bottom:1px solid var(--border); white-space:nowrap;
+  }
+  thead th:first-child{position:sticky; left:0; z-index:3; background:#FAF9F7;}
+  tbody td{padding:9px 14px; font-size:12.5px; color:var(--ink-700); border-bottom:1px solid #F0EEEB; white-space:nowrap;}
+  tbody td:first-child{
+    position:sticky; left:0; background:#fff; font-weight:700; color:var(--ink-900);
+    box-shadow:1px 0 0 var(--border);
+  }
+  tbody tr:hover td{background:#FBFAF9;}
+  tbody tr:hover td:first-child{background:#FBFAF9;}
+
+  .pill{display:inline-flex; align-items:center; gap:3px; padding:0px 6px; border-radius:7px; font-size:9px; font-weight:700;}
+  .pill.ok{background:var(--success-bg); color:var(--success);}
+  .pill.warn{background:var(--warn-bg); color:var(--warn);}
+  .muted{color:var(--ink-400);}
+  .accent-text{color:var(--accent-dark); font-weight:600;}
+  .info-dot{color:var(--ink-400); cursor:default;}
+
+  /* status bar */
+  .status-bar{
+    flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:9px 24px; border-top:1px solid var(--border); background:#fff;
+    font-size:12px; color:var(--ink-500);
+  }
+  .status-bar b{color:var(--ink-900);}
+
+  /* ===================== INLINE CALENDAR VIEW ===================== */
+  .calendar-view{display:none;flex:1;min-width:0;min-height:0;flex-direction:column;background:#fff;overflow:hidden;}
+  .calendar-view.active{display:flex;}
+  .equipment-view{display:flex;flex:1;min-width:0;min-height:0;flex-direction:column;}
+  .equipment-view.hidden{display:none;}
+  .calendar-header{flex:none;padding:20px 24px 14px;border-bottom:1px solid var(--border);background:#fff;}
+  .calendar-header h1{font-size:19px;margin:0 0 14px;}
+  .calendar-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .calendar-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;width:420px;max-width:420px;}
+  .calendar-search svg{color:var(--ink-400);flex:none;}
+  .calendar-search input{border:none;outline:none;font-size:13px;width:100%;font-family:inherit;color:var(--ink-900);}
+  .calendar-search input::placeholder{color:var(--ink-400);}
+  .calendar-view-tabs{display:flex;gap:2px;align-items:center;margin-left:auto;}
+  .calendar-view-tab{padding:8px 14px;border:none;background:transparent;color:var(--ink-700);font-size:12.5px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;}
+  .calendar-view-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .calendar-nav-btns{display:flex;gap:8px;}
+  .calendar-nav-btn{padding:8px 12px;border:1px solid var(--border);background:#fff;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-700);}
+  .calendar-wrapper{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:var(--border);}
+  .select-all-row{padding:10px 16px;border-bottom:1px solid var(--border);background:#fff;flex:none;}
+  .select-all-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-900);}
+  .select-all-label input{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);}
+  .calendar-header-row{display:grid;grid-template-columns:240px repeat(7,minmax(120px,1fr));gap:1px;background:var(--border);padding:1px;flex:none;min-height:72px;}
+  .calendar-header-cell{background:#fff;padding:12px 8px;text-align:center;font-size:11px;font-weight:700;color:var(--ink-700);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);}
+  .calendar-header-cell:first-child{align-items:flex-start;text-align:left;padding-left:14px;}
+  .calendar-header-cell .date-number{font-size:15px;color:var(--ink-900);}
+  .calendar-rows{flex:1;min-height:0;display:grid;grid-template-columns:240px repeat(7,minmax(120px,1fr));grid-auto-rows:minmax(125px,max-content);gap:1px;background:var(--border);padding:1px;overflow:auto;}
+  .calendar-row{display:contents;}
+  .equipment-cell-calendar{background:#fff;padding:10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-width:0;position:relative;}
+  .equipment-cell-calendar:hover{background:#FAFAF9;}
+  .equipment-cell-wrapper{display:flex;gap:8px;width:100%;height:100%;min-width:0;align-items:flex-start;}
+  .equipment-image-wrapper{width:56px;height:56px;flex-shrink:0;position:relative;border-radius:6px;overflow:hidden;background:#f3f4f6;}
+  .equipment-image{width:100%;height:100%;display:block;object-fit:contain;padding:2px;border-radius:6px;}
+  .equipment-info-calendar{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+  .equipment-name-calendar{margin:0 0 2px;font-size:12px;font-weight:700;color:var(--ink-900);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .equipment-detail-calendar{margin:0;font-size:10px;color:var(--ink-500);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .equipment-checkbox{width:17px;height:17px;flex-shrink:0;margin-top:2px;cursor:pointer;accent-color:var(--accent);}
+  .day-cell{background:#fff;padding:8px;min-width:0;position:relative;display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .day-cell.weekend{background:#FAFAF9;}
+  .cell-date{flex:none;margin-bottom:7px;font-size:11px;font-weight:700;color:var(--ink-700);}
+  .cell-events{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .calendar-event{width:100%;padding:8px 9px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;word-wrap:break-word;overflow:hidden;display:flex;flex-direction:column;gap:3px;border:1px solid transparent;position:relative;transition:transform .15s ease,box-shadow .15s ease;}
+  .calendar-event:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.10);}
+  .event-icon{font-size:13px;line-height:1;}
+  .event-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+  .event-time{font-size:10px;opacity:.8;font-weight:500;}
+  .event-expected-return{background:#E0F2FE;color:#0C4A6E;border-left:3px solid #0284C7;}
+  .event-reported-issue{background:#F3E8FF;color:#5B21B6;border-left:3px solid #A855F7;}
+  .event-maintenance{background:#DCFCE7;color:#15803D;border-left:3px solid #22C55E;}
+
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="brand" onclick="window.location.href='dashboard-mockup.html'">
+      <div class="logo-mark"></div>
+      EG TraceTool
+    </div>
+    <div class="nav-tabs">
+      <div class="nav-tab" onclick="window.location.href='dashboard-mockup.html'">Frontpage</div>
+      <div class="nav-tab active">Equipment</div>
+      <div class="nav-tab">Modules</div>
+      <div class="nav-tab">Projects</div>
+      <div class="nav-tab">Employees</div>
+      <div class="nav-tab">Reports</div>
+    </div>
+    <div class="top-nav-right">
+      <div class="nav-icon-btn" title="Selection list">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-icon-btn" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span class="nav-badge">165</span>
+      </div>
+      <div class="nav-icon-btn" title="Support">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-1c0-1 .6-1.5 1.5-2.2A3 3 0 1010 9.5"/><circle cx="12" cy="18.2" r=".3"/></svg>
+      </div>
+      <div class="user-chip" onclick="window.location.href='login-mockup.html'" title="Log out">
+        <div class="avatar">KK</div>
+        <span class="name">Khyathi Kulal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="icon-sidebar">
+      <div class="icon-nav-item active" id="searchEquipmentNav" onclick="showEquipmentView()">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <span class="label">Search for equipment</span>
+      </div>
+      <div class="icon-nav-item" id="calendarNav" onclick="showCalendarView()">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></div>
+        <span class="label">Calendar</span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='service-tasks-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2z"/></svg></div>
+        <span class="label">Service tasks Equipment </span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='mass-edit-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3z"/><path d="M4 20l1-4"/></svg></div>
+        <span class="label">Mass edit</span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='orderlists-mockup.html';">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></div>
+        <span class="label">Orderlists</span>
+      </div>
+
+      <button class="create-btn" onclick="window.location.href='create-equipment-step1.html'">
+        <div class="icon-tile"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></div>
+        <span class="label">New equipment</span>
+      </button>
+
+      <div class="icon-sidebar-spacer"></div>
+      <div class="icon-sidebar-footer">
+        <button class="side-btn">Feedback</button>
+        <button class="side-btn">v1.1.09922.S <span class="new-badge">New</span></button>
+      </div>
+    </aside>
+
+    <div class="content-area">
+      <div class="equipment-view" id="equipmentView">
+      <div class="content-header">
+        <h1>Search for equipment</h1>
+        <div class="toolbar">
+          <div class="search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" placeholder="Search equipment, barcode, serial number…">
+            <span class="clear-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </span>
+          </div>
+          <button class="tbtn" id="moreOptionsBtn" onclick="toggleFilterPanel(event)">
+            More search options
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <button class="tbtn icon-only" title="Refresh">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M5.5 9a7 7 0 0112-3.5L20 8M4 16l2.5 2.5A7 7 0 0018.5 15"/></svg>
+          </button>
+          <div class="toolbar-spacer"></div>
+          <div class="segmented">
+            <div class="seg active" title="List view">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <div class="seg" title="Card view">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+          </div>
+          <button class="tbtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v16M12 4v16M20 4v16"/></svg>
+            Show columns
+          </button>
+        </div>
+
+        <div class="filter-panel" id="filterPanel">
+        <div class="filter-grid">
+          <label>Department:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <label>Responsible:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+
+          <label>Equipment group:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <label>Equipment type:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+
+          <label>Manufacturer:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <label>Warehouse:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+
+          <label>Status:</label>
+          <div class="filter-field">
+            <select><option>(all)</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <label>Condition:</label>
+          <div class="filter-field">
+            <select><option>Active</option></select>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+
+          <div class="filter-created-row">
+            <label class="filter-check"><input type="checkbox"> Created:</label>
+            <div class="date-field">
+              <span class="date-tag">From</span>
+              <div class="filter-field">
+                <input type="text" value="01-01-0001">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+              </div>
+            </div>
+            <div class="date-field">
+              <span class="date-tag">To</span>
+              <div class="filter-field">
+                <input type="text" value="01-01-0001">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-divider"></div>
+
+        <div class="filter-footer">
+          <div class="filter-footer-buttons">
+            <button class="tbtn">Reset</button>
+            <button class="tbtn">Set as default</button>
+          </div>
+          <div class="filter-footer-right">
+            <label>Sorting:</label>
+            <div class="filter-field">
+              <select><option>Date created, latest first</option></select>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <label>Maximum number of results:</label>
+            <div class="filter-field">
+              <select><option>No limit</option></select>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Equipment no.</th>
+              <th>Equipment group</th>
+              <th>Manufacturer</th>
+              <th>Description</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Responsible</th>
+              <th>Placement</th>
+              <th>Purchase date</th>
+              <th>Purchase price</th>
+              <th>Barcode</th>
+              <th>Date created</th>
+              <th>Warehouse</th>
+              <th>Picked up by</th>
+              <th>Ekstra felt 1</th>
+              <th>Ekstra felt 2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2344</td><td>Extraction ventilation</td><td>3M Scott Safety</td><td>tttt</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td class="muted">—</td><td class="muted">Stockstatus</td>
+              <td class="muted">—</td><td>0,03 kr</td><td>1002765</td><td>29-06-2026</td><td>Hovedlager</td><td class="muted">—</td>
+              <td>rrr</td><td>ttttt</td>
+            </tr>
+            <tr>
+              <td>2341</td><td>1-part foam</td><td>A&N</td><td>fghhh</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td class="muted">—</td><td class="muted">Stockstatus</td>
+              <td class="muted">—</td><td>1,78 kr</td><td>1002760</td><td>28-06-2026</td><td>Hovedlager</td><td class="muted">—</td>
+              <td>tyuo</td><td>xc</td>
+            </tr>
+            <tr>
+              <td>2317</td><td>dvk</td><td>+8</td><td>Ttt</td><td>Abak Kloakservice</td>
+              <td><span class="pill warn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 18a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>Check</span></td>
+              <td class="muted">—</td><td class="muted">Stockstatus</td>
+              <td class="muted">—</td><td>4,00 kr</td><td>1002677</td><td>24-06-2026</td><td>Hovedlager</td><td class="muted">—</td>
+              <td>1</td><td>2</td>
+            </tr>
+            <tr>
+              <td>2277</td><td>Aircon filler</td><td>+8</td><td>2277</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td class="muted">—</td><td>In stock (India)</td>
+              <td>22-06-2026</td><td>22,77 kr</td><td>1002555</td><td>22-06-2026</td><td>India</td><td class="muted">—</td>
+              <td>2</td><td>2</td>
+            </tr>
+            <tr>
+              <td>2235</td><td>Washing facilities</td><td>3M Scott Safety</td><td>tt</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td class="muted">—</td><td>In stock (Malerlager)</td>
+              <td class="muted">—</td><td>1,20 kr</td><td>1002464</td><td>15-06-2026</td><td>Malerlager</td><td class="muted">—</td>
+              <td>23</td><td>1</td>
+            </tr>
+            <tr>
+              <td>2197</td><td>dwdwdwd</td><td>+8</td><td>AAAAAAAA</td><td>Abak Kloakservice</td>
+              <td><span class="pill warn"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 18a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>Check</span></td>
+              <td>roshan kali</td><td class="accent-text">Handed out</td>
+              <td class="muted">—</td><td>0,00 kr</td><td>1002417</td><td>10-06-2026</td><td>Mangalore</td><td class="muted">—</td>
+              <td class="muted">—</td><td class="muted">—</td>
+            </tr>
+            <tr>
+              <td>2190</td><td>Cordless angle grinder</td><td>DeWalt</td><td>DCG412N</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td>roshan kali</td><td class="accent-text">Handed out</td>
+              <td class="muted">—</td><td>0,00 kr</td><td>1002407</td><td>09-06-2026</td><td>Mangalore</td><td>Den nye gruppe</td>
+              <td class="muted">—</td><td class="muted">—</td>
+            </tr>
+            <tr>
+              <td>2184</td><td>Vacuum cleaner</td><td>DeWalt</td><td>D27900</td><td>Abak Kloakservice</td>
+              <td><span class="pill ok">Active</span></td><td>roshan kali</td><td class="accent-text">Handed out</td>
+              <td class="muted">—</td><td>0,00 kr</td><td>1002390</td><td>09-06-2026</td><td>India1</td><td>Våd og tør…</td>
+              <td class="muted">—</td><td class="muted">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      </div>
+      <div class="calendar-view" id="calendarView">
+        <div class="calendar-header">
+          <h1>Calendar overview</h1>
+          <div class="calendar-toolbar">
+            <div class="calendar-search">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input type="text" id="calendarSearchInput" placeholder="Search equipment, events...">
+            </div>
+            <div class="calendar-view-tabs">
+              <button class="calendar-view-tab" onclick="setCalendarView('today',this)">Today</button>
+              <button class="calendar-view-tab" onclick="setCalendarView('day',this)">Day</button>
+              <button class="calendar-view-tab active" onclick="setCalendarView('week',this)">Week</button>
+              <button class="calendar-view-tab" onclick="setCalendarView('month',this)">Month</button>
+            </div>
+            <div class="calendar-nav-btns">
+              <button class="calendar-nav-btn" onclick="previousCalendarPeriod()">‹ Previous</button>
+              <button class="calendar-nav-btn" onclick="nextCalendarPeriod()">Next ›</button>
+            </div>
+          </div>
+        </div>
+        <div class="calendar-wrapper">
+          <div class="select-all-row">
+            <label class="select-all-label">
+              <input type="checkbox" id="selectAllCheckbox" onchange="toggleCalendarSelectAll(this.checked)">
+              <span>Select all</span>
+            </label>
+          </div>
+          <div class="calendar-header-row" id="calendarHeader"></div>
+          <div class="calendar-rows" id="calendarRows"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar" id="equipmentStatusBar">
+    <span>Status: (all)</span>
+    <span><b>203 results</b> were found · Total value <b>231,456.30 kr</b></span>
+  </div>
+
+  <script>
+    function toggleFilterPanel(e){
+      e.stopPropagation();
+      document.getElementById('filterPanel').classList.toggle('open');
+      document.getElementById('moreOptionsBtn').classList.toggle('open');
+    }
+    document.getElementById('filterPanel').addEventListener('click', function(e){ e.stopPropagation(); });
+    window.addEventListener('click', function(){
+      document.getElementById('filterPanel').classList.remove('open');
+      document.getElementById('moreOptionsBtn').classList.remove('open');
+    });
+    const calendarEquipment=[
+      {id:1,name:'Mobile Crane 50t',number:'EQ: CR-50-01',group:'Cranes',image:'assets/Screenshot_12-8-2026_151427_www.bing.com.jpeg'},
+      {id:2,name:'Forklift 3t',number:'EQ: FL-03-02',group:'Lifting & Handling',image:'assets/Screenshot_12-8-2026_151611_www.bing.com.jpeg'},
+      {id:3,name:'Telehandler 4t',number:'EQ: TH-04-07',group:'Lifting & Handling',image:'assets/Screenshot_12-8-2026_151637_www.bing.com.jpeg'},
+      {id:4,name:'Boom Lift 20m',number:'EQ: BL-20-03',group:'Access Equipment',image:'assets/Screenshot_12-8-2026_151427_www.bing.com.jpeg'},
+      {id:5,name:'Generator 100kVA',number:'EQ: GN-100-01',group:'Power & Utilities',image:'assets/Screenshot_12-8-2026_151611_www.bing.com.jpeg'},
+      {id:6,name:'Mini Excavator 2t',number:'EQ: EX-02-05',group:'Earth Moving',image:'assets/Screenshot_12-8-2026_151637_www.bing.com.jpeg'},
+      {id:7,name:'Scissor Lift 12m',number:'EQ: SL-12-04',group:'Access Equipment',image:'assets/Screenshot_12-8-2026_151427_www.bing.com.jpeg'}
+    ];
+    const calendarEvents=[
+      {id:1,equipmentId:1,date:new Date(2026,7,10),type:'expected-return',title:'Expected return',time:'10:00 AM'},
+      {id:2,equipmentId:1,date:new Date(2026,7,13),type:'reported-issue',title:'Reported issue',time:'All day'},
+      {id:3,equipmentId:2,date:new Date(2026,7,11),type:'expected-return',title:'Expected return',time:'2:00 PM'},
+      {id:4,equipmentId:3,date:new Date(2026,7,12),type:'expected-return',title:'Expected return',time:'9:30 AM'},
+      {id:5,equipmentId:3,date:new Date(2026,7,14),type:'reported-issue',title:'Reported issue',time:'All day'},
+      {id:6,equipmentId:4,date:new Date(2026,7,11),type:'maintenance',title:'Maintenance',time:'8:00 AM – 4:00 PM'},
+      {id:7,equipmentId:4,date:new Date(2026,7,14),type:'expected-return',title:'Expected return',time:'3:00 PM'},
+      {id:8,equipmentId:5,date:new Date(2026,7,13),type:'reported-issue',title:'Reported issue',time:'All day'},
+      {id:9,equipmentId:6,date:new Date(2026,7,10),type:'maintenance',title:'Maintenance',time:'8:00 AM – 12:00 PM'},
+      {id:10,equipmentId:6,date:new Date(2026,7,15),type:'expected-return',title:'Expected return',time:'11:00 AM'},
+      {id:11,equipmentId:7,date:new Date(2026,7,11),type:'expected-return',title:'Expected return',time:'1:00 PM'}
+    ];
+    let calendarDate=new Date(2026,7,12),calendarViewMode='week',calendarSelected=new Set();
+    function showCalendarView(){document.getElementById('equipmentView')?.classList.add('hidden');document.getElementById('calendarView')?.classList.add('active');const s=document.getElementById('equipmentStatusBar');if(s)s.style.display='none';document.getElementById('searchEquipmentNav')?.classList.remove('active');document.getElementById('calendarNav')?.classList.add('active');renderCalendar();}
+    function showEquipmentView(){document.getElementById('calendarView')?.classList.remove('active');document.getElementById('equipmentView')?.classList.remove('hidden');const s=document.getElementById('equipmentStatusBar');if(s)s.style.display='flex';document.getElementById('calendarNav')?.classList.remove('active');document.getElementById('searchEquipmentNav')?.classList.add('active');}
+    function getWeekStart(d){const x=new Date(d),day=x.getDay()||7;x.setDate(x.getDate()-day+1);return x;}
+    function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+    function eventIcon(type){return {'expected-return':'📌','reported-issue':'📋','maintenance':'🔧','calibration':'🔧','complaint':'💬'}[type]||'📋';}
+    function renderCalendar(){const start=getWeekStart(calendarDate);renderCalendarHeader(start);renderCalendarRows(start);updateSelectAll();}
+    function renderCalendarHeader(start){const h=document.getElementById('calendarHeader');if(!h)return;const names=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];let html='<div class="calendar-header-cell">Equipment</div>';for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);html+=`<div class="calendar-header-cell"><div>${names[i]}</div><div class="date-number">${d.getDate()}</div></div>`;}h.innerHTML=html;}
+    function renderCalendarRows(start){const rows=document.getElementById('calendarRows');if(!rows)return;const term=(document.getElementById('calendarSearchInput')?.value||'').toLowerCase().trim();let html='';calendarEquipment.forEach(eq=>{if(term&&!(`${eq.name} ${eq.number} ${eq.group}`).toLowerCase().includes(term))return;let row=`<div class="equipment-cell-calendar"><div class="equipment-cell-wrapper"><div class="equipment-image-wrapper"><img src="${eq.image}" alt="${eq.name}" class="equipment-image"></div><div class="equipment-info-calendar"><div class="equipment-name-calendar">${eq.name}</div><div class="equipment-detail-calendar">${eq.number}</div><div class="equipment-detail-calendar">${eq.group}</div></div><input type="checkbox" class="equipment-checkbox" ${calendarSelected.has(eq.id)?'checked':''} onchange="toggleCalendarEquipment(${eq.id})"></div></div>`;for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const ev=calendarEvents.filter(e=>e.equipmentId===eq.id&&sameDay(e.date,d));const evHtml=ev.map(e=>`<div class="calendar-event event-${e.type}" onclick="openCalendarEvent(${e.id})"><span class="event-icon">${eventIcon(e.type)}</span><span class="event-title">${e.title}</span><span class="event-time">${e.time}</span></div>`).join('');row+=`<div class="day-cell ${i>=5?'weekend':''}"><div class="cell-date">${d.getDate()}</div><div class="cell-events">${evHtml}</div></div>`;}html+=`<div class="calendar-row">${row}</div>`;});rows.innerHTML=html;}
+    function toggleCalendarEquipment(id){if(calendarSelected.has(id))calendarSelected.delete(id);else calendarSelected.add(id);updateSelectAll();}
+    function toggleCalendarSelectAll(checked){if(checked)calendarSelected=new Set(calendarEquipment.map(e=>e.id));else calendarSelected.clear();renderCalendar();}
+    function updateSelectAll(){const cb=document.getElementById('selectAllCheckbox');if(!cb)return;cb.checked=calendarSelected.size===calendarEquipment.length;cb.indeterminate=calendarSelected.size>0&&calendarSelected.size<calendarEquipment.length;}
+    function setCalendarView(view,button){calendarViewMode=view;document.querySelectorAll('.calendar-view-tab').forEach(b=>b.classList.remove('active'));button?.classList.add('active');if(view==='today')calendarDate=new Date(2026,7,12);renderCalendar();}
+    function previousCalendarPeriod(){calendarDate.setDate(calendarDate.getDate()-(calendarViewMode==='day'?1:7));renderCalendar();}
+    function nextCalendarPeriod(){calendarDate.setDate(calendarDate.getDate()+(calendarViewMode==='day'?1:7));renderCalendar();}
+    document.getElementById('calendarSearchInput')?.addEventListener('input',renderCalendar);
+    function openCalendarEvent(id){
+      const item = calendarEvents.find(e => e.id === id);
+      const eq = calendarEquipment.find(e => e.id === item?.equipmentId);
+      if(item && eq){
+        alert(`${eq.name}\n\n${item.title}\n${item.time}`);
+      }
+    }
+
+  </script>
+</body>
+</html>

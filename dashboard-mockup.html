@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EG TraceTool — Frontpage Dashboard (Redesign Mockup)</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --hover-bg:#F5F4F2;
+    --bg-card:#FFFFFF;
+    --success:#2E8B57;
+    --success-bg:#E7F5EC;
+    --danger:#C0392B;
+    --danger-bg:#FBEAEA;
+    --warn:#B7791F;
+    --warn-bg:#FBF1DD;
+    --series-1:#BB5B2C; /* Hand-outs — validated categorical set, see docs/ui-redesign notes */
+    --series-2:#199E70; /* Hand-ins */
+    --series-3:#7A5AA6; /* Service */
+    --radius:10px;
+    --radius-sm:6px;
+    --shadow-card:0 1px 2px rgba(31,36,48,.04), 0 1px 1px rgba(31,36,48,.03);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;overflow:hidden;}
+  body{font-family:'Segoe UI', Roboto, Arial, sans-serif; background:var(--bg-page); color:var(--ink-900); font-size:14px; display:flex; flex-direction:column;}
+  a{color:inherit;}
+  svg{display:block;}
+
+  /* ---------------- Top nav ---------------- */
+  .top-nav{
+    display:flex; align-items:center; gap:28px; flex:none;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;flex:none;
+    background:url('assets/logo.png') center/cover no-repeat, linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+  }
+  .nav-tabs{display:flex; gap:4px; height:100%;}
+  .nav-tab{
+    display:flex;align-items:center;height:100%;padding:0 14px;
+    font-size:13.5px; font-weight:600; color:var(--ink-500); border-bottom:2px solid transparent;
+    cursor:pointer;
+  }
+  .nav-tab.active{color:var(--ink-900); border-bottom-color:var(--accent);}
+  .top-nav-right{margin-left:auto; display:flex; align-items:center; gap:18px;}
+  .nav-icon-btn{position:relative; color:var(--ink-500); cursor:pointer;}
+  .nav-badge{
+    position:absolute; top:-6px; right:-8px; background:var(--accent); color:#fff;
+    font-size:10px; font-weight:700; border-radius:8px; padding:1px 5px; line-height:1.3;
+  }
+  .user-menu-wrap{position:relative; padding-left:14px; border-left:1px solid var(--border);}
+  .user-chip{display:flex; align-items:center; gap:8px; cursor:pointer;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-light); color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px; flex:none;}
+  .user-chip .name{font-size:13px;font-weight:600;}
+  .user-chip .chevron{color:var(--ink-400); margin-left:2px;}
+
+  .user-menu{
+    display:none; position:absolute; top:calc(100% + 10px); right:0; width:250px;
+    background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 12px 28px rgba(31,36,48,.14); overflow:hidden; z-index:50;
+  }
+  .user-menu.open{display:block;}
+  .user-menu-header{display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border);}
+  .user-menu-header .avatar{width:38px;height:38px;font-size:14px;}
+  .user-menu-header .who{min-width:0;}
+  .user-menu-header .who .name{font-size:13.5px; font-weight:700; color:var(--ink-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .user-menu-header .who .email{font-size:12px; color:var(--ink-500); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .user-menu-list{padding:6px 0;}
+  .user-menu-item{
+    display:flex; align-items:center; gap:10px; padding:9px 16px;
+    font-size:13px; color:var(--ink-700); cursor:pointer;
+  }
+  .user-menu-item:hover{background:var(--hover-bg);}
+  .user-menu-item svg{color:var(--ink-500); flex:none;}
+  .user-menu-item .chevron{margin-left:auto; color:var(--ink-400);}
+  .user-menu-divider{border-top:1px solid var(--border); margin:6px 0;}
+
+  /* ---------------- Layout ---------------- */
+  .layout{display:flex; align-items:stretch; flex:1; min-height:0;}
+  .sidebar{
+    width:220px; flex:none; background:#fff; border-right:1px solid var(--border);
+    padding:48px 18px 24px; display:flex; flex-direction:column; overflow-y:auto;
+  }
+  .dashboard-scroll{flex:1; min-width:0; overflow-y:auto;}
+  .sidebar h2{font-size:16px; margin:0 0 6px; font-weight:700; line-height:1.3;}
+  .sidebar .welcome-sub{font-size:12.5px; color:var(--ink-500); margin:0 0 20px;}
+  .shop-btn{
+    border:1px solid var(--border); background:#fff; border-radius:var(--radius-sm);
+    padding:9px 12px; font-size:13px; font-weight:600; color:var(--ink-900); cursor:pointer;
+    display:flex; align-items:center; gap:8px; width:fit-content;
+  }
+  .sidebar-spacer{
+    flex:1; background-image:url('assets/logo.png'); background-repeat:no-repeat;
+    background-position:center; background-size:96px; opacity:.05;
+  }
+  .sidebar-footer{border-top:1px solid var(--border); padding-top:16px; display:flex; flex-direction:column; gap:8px;}
+  .sidebar-footer .brand-mini{font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:8px; margin-bottom:4px;}
+  .side-btn{
+    border:1px solid var(--border); background:#fff; border-radius:var(--radius-sm);
+    padding:8px 10px; font-size:12.5px; font-weight:600; color:var(--ink-700); text-align:left; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .new-badge{background:var(--accent); color:#fff; font-size:9.5px; font-weight:700; border-radius:8px; padding:1px 6px;}
+
+  .dashboard{
+    padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:stretch;
+  }
+
+  /* ---------------- KPI stat tiles ---------------- */
+  .kpi-row{grid-column:1 / -1; display:grid; grid-template-columns:repeat(4, 1fr); gap:18px;}
+  .kpi-card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow-card); padding:18px;
+  }
+  .kpi-head{display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px;}
+  .kpi-label{font-size:13px; font-weight:600; color:var(--ink-500);}
+  .kpi-icon{width:36px; height:36px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center;}
+  .kpi-value{font-size:26px; font-weight:700; color:var(--ink-900); line-height:1.1; margin-bottom:9px;}
+  .kpi-delta{display:flex; align-items:center; gap:5px; font-size:12.5px;}
+  .kpi-delta svg{flex:none;}
+  .kpi-delta.good{color:var(--success);}
+  .kpi-delta.bad{color:var(--danger);}
+  .kpi-delta-note{color:var(--ink-500); font-weight:400;}
+
+  /* ---------------- Cards ---------------- */
+  .card{
+    background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow-card); overflow:hidden;
+    height:300px; display:flex; flex-direction:column;
+  }
+  .card-head{
+    flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; border-bottom:1px solid var(--border);
+  }
+  .card-head h3{margin:0; font-size:14px; font-weight:700;}
+  .card-body{flex:1; min-height:0; overflow-y:auto; padding:0;}
+  .select-sm{
+    font-size:12.5px; border:1px solid var(--border); border-radius:6px; padding:5px 10px;
+    color:var(--ink-700); background:#fff; font-family:inherit;
+  }
+  .link-btn{font-size:12.5px; font-weight:600; color:var(--accent-dark); background:none; border:none; cursor:pointer;}
+
+  table{width:100%; border-collapse:collapse;}
+  thead{position:sticky; top:0; z-index:1; background:#fff;}
+  thead th{
+    background:#fff;
+    text-align:left; font-size:11px; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--ink-500); font-weight:600; padding:10px 18px 8px; border-bottom:1px solid var(--border);
+  }
+  tbody td{padding:10px 18px; font-size:13px; border-bottom:1px solid #F0EEEB; color:var(--ink-700);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td.strong{color:var(--ink-900); font-weight:600;}
+  .pill{display:inline-block; padding:0px 6px; border-radius:8px; font-size:9.5px; font-weight:700;}
+  .pill.ok{background:var(--success-bg); color:var(--success);}
+  .pill.late{background:var(--danger-bg); color:var(--danger);}
+  .text-ok{color:var(--success); font-weight:600;}
+  .text-late{color:var(--danger); font-weight:600;}
+
+  /* ---------------- Weekly chart ---------------- */
+  .chart-wrap{flex:1; min-height:0; overflow-y:auto; padding:18px;}
+  .chart-legend{display:flex; gap:16px; margin-bottom:16px; font-size:12px; color:var(--ink-700);}
+  .chart-legend span{display:flex; align-items:center; gap:7px;}
+  .legend-key{width:10px; height:10px; border-radius:2px;}
+  .chart-plot{position:relative; display:flex; height:132px;}
+  .chart-yaxis{
+    flex:none; width:22px; height:132px; display:flex; flex-direction:column; justify-content:space-between;
+    text-align:right; padding-right:8px; font-size:10.5px; color:var(--ink-400); font-variant-numeric:tabular-nums;
+  }
+  .chart-gridlines{
+    position:absolute; left:30px; right:0; top:0; height:132px;
+    display:flex; flex-direction:column; justify-content:space-between; pointer-events:none;
+  }
+  .chart-gridlines div{border-top:1px solid #ECE9E5;}
+  .chart-gridlines div:last-child{border-top:1px solid var(--ink-400);}
+  .bars{position:relative; flex:1; display:flex; align-items:flex-end; gap:16px; height:132px; padding:0 6px;}
+  .bar-group{flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end;}
+  .bar-stack{display:flex; align-items:flex-end; gap:2px; height:100%;}
+  .bar{
+    width:13px; border-radius:4px 4px 0 0; cursor:pointer; outline:none;
+    transition:filter .1s ease;
+  }
+  .bar:hover, .bar:focus{filter:brightness(0.87);}
+  .bar-label{font-size:11px; color:var(--ink-500); margin-top:8px;}
+  .chart-tooltip{
+    position:absolute; background:var(--ink-900); color:#fff; font-size:11.5px;
+    padding:6px 10px; border-radius:6px; pointer-events:none; white-space:nowrap;
+    transform:translate(-50%,-100%); margin-top:-8px; opacity:0; transition:opacity .08s ease; z-index:5;
+  }
+  .chart-tooltip.show{opacity:1;}
+  .chart-tooltip .tt-val{font-weight:700;}
+  .chart-tooltip .tt-key{display:inline-block; width:7px; height:7px; border-radius:1px; margin-right:5px;}
+
+  /* ---------------- Timeline ---------------- */
+  .timeline{flex:1; min-height:0; overflow-y:auto; padding:6px 18px 14px;}
+  .tl-date{font-size:11.5px; font-weight:700; color:var(--ink-500); text-transform:uppercase; letter-spacing:.03em; margin:14px 0 8px;}
+  .tl-item{display:flex; gap:10px; padding:7px 0;}
+  .tl-icon{
+    width:22px;height:22px;border-radius:50%; flex:none; margin-top:1px;
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .tl-text{font-size:13px; color:var(--ink-700); line-height:1.4;}
+  .tl-time{font-size:11.5px; color:var(--ink-400); display:block; margin-top:1px;}
+
+  .empty-note{padding:24px 18px; font-size:12.5px; color:var(--ink-400); text-align:center;}
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="brand">
+      <div class="logo-mark"></div>
+      EG TraceTool
+    </div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Frontpage</div>
+      <div class="nav-tab" onclick="window.location.href='equipment-mockup.html'">Equipment</div>
+      <div class="nav-tab">Modules</div>
+      <div class="nav-tab">Projects</div>
+      <div class="nav-tab">Employees</div>
+      <div class="nav-tab">Reports</div>
+    </div>
+    <div class="top-nav-right">
+      <div class="nav-icon-btn" title="Selection list">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-icon-btn" title="Notifications">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span class="nav-badge">165</span>
+      </div>
+      <div class="nav-icon-btn" title="Support">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-1c0-1 .6-1.5 1.5-2.2A3 3 0 1010 9.5"/><circle cx="12" cy="18.2" r=".3"/></svg>
+      </div>
+      <div class="user-menu-wrap">
+        <div class="user-chip" id="userChip" style="cursor:pointer;">
+          <div class="avatar">KK</div>
+          <span class="name">Khyathi Kulal</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="user-menu" id="userMenu">
+          <div class="user-menu-header">
+            <div class="avatar">KK</div>
+            <div class="who">
+              <div class="name">Khyathi Kulal</div>
+              <div class="email">khyathi.kulal@eg.dk</div>
+            </div>
+          </div>
+          <div class="user-menu-list">
+            <div class="user-menu-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              My equipment
+            </div>
+            <div class="user-menu-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+              Change password
+            </div>
+            <div class="user-menu-item" onclick="window.location.href='company-settings-mockup.html'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+              Company settings
+            </div>
+            <div class="user-menu-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+              Release Notes
+            </div>
+            <div class="user-menu-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+              Language: English
+              <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+            <div class="user-menu-divider"></div>
+            <div class="user-menu-item" onclick="window.location.href='login-mockup.html'">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              Log out
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Welcome to TraceTool</h2>
+      <p class="welcome-sub">Go to the shop for supplies</p>
+      <button class="shop-btn">
+        Shop
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </button>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-footer">
+        <div class="brand-mini">
+          <div class="logo-mark"></div>
+          EG TraceTool
+        </div>
+        <button class="side-btn">Feedback</button>
+        <button class="side-btn">v1.1.09922.S <span class="new-badge">New</span></button>
+      </div>
+    </aside>
+
+    <div class="dashboard-scroll">
+    <main class="dashboard">
+
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Total equipment</span>
+            <div class="kpi-icon" style="background:var(--accent-light); color:var(--accent-dark)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">1,248</div>
+          <div class="kpi-delta good">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 18L18 6M9 6h9v9"/></svg>
+            <strong>+3.2%</strong><span class="kpi-delta-note">since last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Handed out today</span>
+            <div class="kpi-icon" style="background:var(--success-bg); color:var(--success)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">86</div>
+          <div class="kpi-delta good">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 18L18 6M9 6h9v9"/></svg>
+            <strong>+12%</strong><span class="kpi-delta-note">vs yesterday</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Overdue services</span>
+            <div class="kpi-icon" style="background:var(--danger-bg); color:var(--danger)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">24</div>
+          <div class="kpi-delta bad">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 18L18 6M9 6h9v9"/></svg>
+            <strong>+9</strong><span class="kpi-delta-note">vs last week</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-label">Minimum stock alerts</span>
+            <div class="kpi-icon" style="background:var(--warn-bg); color:var(--warn)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 18a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value">7</div>
+          <div class="kpi-delta good">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 9V6h3"/></svg>
+            <strong>−2</strong><span class="kpi-delta-note">vs last week</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. My equipment -->
+      <section class="card">
+        <div class="card-head">
+          <h3>My equipment</h3>
+          <button class="link-btn">More &gt;</button>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Equipment</th><th>Group</th><th>Amount</th><th>Handed out</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">1123 · 3M Scott Safety</td><td>ABA</td><td>18</td><td>15-01-2026</td></tr>
+              <tr><td class="strong">1567 · 3M Sample Desc 2</td><td>fresh</td><td>3</td><td>15-01-2026</td></tr>
+              <tr><td class="strong">1217 · +8 ASDFGH</td><td>Bearing tool</td><td>1</td><td>15-01-2026</td></tr>
+              <tr><td class="strong">1013 · 3M Scott Safety Back hoe</td><td>Backhoe loader</td><td>62</td><td>16-02-2026</td></tr>
+              <tr><td class="strong">1187 · A&amp;N desk</td><td>Washing facilities</td><td>1</td><td>20-02-2026</td></tr>
+              <tr><td class="strong">1025 · 2M-Group Gage</td><td>Air gage</td><td>6</td><td>10-06-2026</td></tr>
+              <tr><td class="strong">2086 · 2M-Group</td><td>dvk</td><td>1</td><td>25-06-2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2. Planned service (Equipment) -->
+      <section class="card">
+        <div class="card-head">
+          <h3>Planned service (Equipment)</h3>
+          <select class="select-sm"><option>Planned</option><option>Exceeded</option><option>All</option></select>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Equipment</th><th>Responsible</th><th>Last service</th><th>Overdue</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">2197 · +8 AAAAAAAA</td><td>roshan kali (1008)</td><td>11-06-2026</td><td><span class="text-ok">in 6 days</span></td></tr>
+              <tr><td class="strong">1136 · Hilti DSH 700</td><td>Purushotham Shetty</td><td>17-07-2025</td><td><span class="text-ok">in 12 days</span></td></tr>
+              <tr><td class="strong">2277 · +8 2277</td><td>In stock (India)</td><td>29-06-2026</td><td><span class="text-ok">in 17 days</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. Weekly overview -->
+      <section class="card">
+        <div class="card-head"><h3>Weekly overview</h3></div>
+        <div class="chart-wrap">
+          <div class="chart-legend">
+            <span><i class="legend-key" style="background:var(--series-1)"></i>Hand-outs</span>
+            <span><i class="legend-key" style="background:var(--series-2)"></i>Hand-ins</span>
+            <span><i class="legend-key" style="background:var(--series-3)"></i>Service</span>
+          </div>
+          <div class="chart-plot">
+            <div class="chart-yaxis"><span>10</span><span>5</span><span>0</span></div>
+            <div class="chart-gridlines"><div></div><div></div><div></div></div>
+            <div class="bars" id="weeklyChart">
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:53px;background:var(--series-1)" tabindex="0" data-day="Tuesday" data-series="Hand-outs" data-value="4" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:26px;background:var(--series-2)" tabindex="0" data-day="Tuesday" data-series="Hand-ins" data-value="2" data-color="var(--series-2)"></div>
+                  <div class="bar" style="height:13px;background:var(--series-3)" tabindex="0" data-day="Tuesday" data-series="Service" data-value="1" data-color="var(--series-3)"></div>
+                </div>
+                <span class="bar-label">Tue</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:92px;background:var(--series-1)" tabindex="0" data-day="Wednesday" data-series="Hand-outs" data-value="7" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:53px;background:var(--series-2)" tabindex="0" data-day="Wednesday" data-series="Hand-ins" data-value="4" data-color="var(--series-2)"></div>
+                  <div class="bar" style="height:13px;background:var(--series-3)" tabindex="0" data-day="Wednesday" data-series="Service" data-value="1" data-color="var(--series-3)"></div>
+                </div>
+                <span class="bar-label">Wed</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:40px;background:var(--series-1)" tabindex="0" data-day="Thursday" data-series="Hand-outs" data-value="3" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:26px;background:var(--series-2)" tabindex="0" data-day="Thursday" data-series="Hand-ins" data-value="2" data-color="var(--series-2)"></div>
+                </div>
+                <span class="bar-label">Thu</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:119px;background:var(--series-1)" tabindex="0" data-day="Friday" data-series="Hand-outs" data-value="9" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:66px;background:var(--series-2)" tabindex="0" data-day="Friday" data-series="Hand-ins" data-value="5" data-color="var(--series-2)"></div>
+                  <div class="bar" style="height:26px;background:var(--series-3)" tabindex="0" data-day="Friday" data-series="Service" data-value="2" data-color="var(--series-3)"></div>
+                </div>
+                <span class="bar-label">Fri</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:26px;background:var(--series-1)" tabindex="0" data-day="Saturday" data-series="Hand-outs" data-value="2" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:13px;background:var(--series-2)" tabindex="0" data-day="Saturday" data-series="Hand-ins" data-value="1" data-color="var(--series-2)"></div>
+                </div>
+                <span class="bar-label">Sat</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:13px;background:var(--series-1)" tabindex="0" data-day="Sunday" data-series="Hand-outs" data-value="1" data-color="var(--series-1)"></div>
+                </div>
+                <span class="bar-label">Sun</span>
+              </div>
+              <div class="bar-group">
+                <div class="bar-stack">
+                  <div class="bar" style="height:79px;background:var(--series-1)" tabindex="0" data-day="Monday" data-series="Hand-outs" data-value="6" data-color="var(--series-1)"></div>
+                  <div class="bar" style="height:40px;background:var(--series-2)" tabindex="0" data-day="Monday" data-series="Hand-ins" data-value="3" data-color="var(--series-2)"></div>
+                  <div class="bar" style="height:13px;background:var(--series-3)" tabindex="0" data-day="Monday" data-series="Service" data-value="1" data-color="var(--series-3)"></div>
+                </div>
+                <span class="bar-label">Mon</span>
+              </div>
+            </div>
+            <div class="chart-tooltip" id="chartTooltip"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Exceeded service (Modules) -->
+      <section class="card">
+        <div class="card-head">
+          <h3>Exceeded service (Modules)</h3>
+          <select class="select-sm"><option>Exceeded</option><option>Planned</option></select>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Module</th><th>Responsible</th><th>Last service</th><th>Overdue</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">1235 · Test Automation Module</td><td>In stock (India1)</td><td>04-02-2026</td><td><span class="pill late">14-02-2026 (141d)</span></td></tr>
+              <tr><td class="strong">1043 · KKR</td><td>In stock (India1)</td><td>13-02-2026</td><td><span class="pill late">15-02-2026 (140d)</span></td></tr>
+              <tr><td class="strong">1195 · Test Automation Module</td><td>In stock (India1)</td><td>28-01-2026</td><td><span class="pill late">17-02-2026 (138d)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. All events -->
+      <section class="card">
+        <div class="card-head">
+          <h3>All events</h3>
+          <select class="select-sm"><option>All</option><option>Hand-outs</option><option>Service</option></select>
+        </div>
+        <div class="timeline">
+          <div class="tl-date">Sunday, 28 June 2026</div>
+          <div class="tl-item">
+            <div class="tl-icon" style="background:var(--danger)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </div>
+            <div class="tl-text">Equipment (2334) ddd deactivated — created by mistake<span class="tl-time">19:42</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-icon" style="background:var(--accent)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="tl-text">Equipment (2325) tttt deactivated — created by mistake<span class="tl-time">19:41</span></div>
+          </div>
+          <div class="tl-date">Saturday, 27 June 2026</div>
+          <div class="tl-item">
+            <div class="tl-icon" style="background:var(--success)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div class="tl-text">Equipment (2184) DeWalt Vacuum cleaner D27900 picked up by roshan kali<span class="tl-time">16:59</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Minimum stock -->
+      <section class="card">
+        <div class="card-head">
+          <h3>Equipment at minimum stock</h3>
+          <button class="link-btn">Export listing</button>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Equipment</th><th>Group</th><th>Stock</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">1254s · 3M testConsumable</td><td>fresh</td><td><span class="pill late">0 / 1 pcs.</span></td></tr>
+              <tr><td class="strong">1223 · 4A hgjgighjhgjgighgh</td><td>D hose 25mm</td><td><span class="pill late">9 / 11 pcs.</span></td></tr>
+              <tr><td class="strong">1268cons · A.B. Chance cons</td><td>BOBCAT</td><td><span class="pill late">0 / 5 pcs.</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 7. Upcoming skills -->
+      <section class="card">
+        <div class="card-head">
+          <h3>Upcoming skills</h3>
+          <select class="select-sm"><option>Planned</option><option>Exceeded</option></select>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Employee</th><th>Skill</th><th>Exceeded</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">1004 · Ankit Jha</td><td>skilltest</td><td><span class="text-ok">in 51 days</span></td></tr>
+              <tr><td class="strong">1111 · Khyathi Kulal</td><td>skilltest</td><td><span class="text-ok">in 48 days</span></td></tr>
+              <tr><td class="strong">1001 · Purushotham Shetty</td><td>skilltest</td><td><span class="text-ok">in 16 days</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 8. Exceeded handins -->
+      <section class="card">
+        <div class="card-head">
+          <h3>Exceeded handins (Equipment)</h3>
+          <button class="link-btn">Export listing</button>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead><tr><th>Equipment</th><th>Responsible</th><th>Overdue</th></tr></thead>
+            <tbody>
+              <tr><td class="strong">1025 · 2M-Group Gage (1kg)</td><td>fhy njjk (1007)</td><td><span class="pill late">10-10-2025 (269d)</span></td></tr>
+              <tr><td class="strong">1175 · +8 todays test</td><td>IndiaDemo2 (1036)</td><td><span class="pill late">10-10-2025 (269d)</span></td></tr>
+              <tr><td class="strong">1237 · 3M Scott hellohello (1kg)</td><td>qwaszxz (1045)</td><td><span class="pill late">10-10-2025 (269d)</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleUserMenu(e){
+      e.stopPropagation();
+      document.getElementById('userMenu').classList.toggle('open');
+    }
+    window.addEventListener('click', function(){
+      document.getElementById('userMenu').classList.remove('open');
+    });
+
+    (function(){
+      const tooltip = document.getElementById('chartTooltip');
+      const chart = document.getElementById('weeklyChart');
+      if (!tooltip || !chart) return;
+
+      function showTooltip(bar){
+        const key = document.createElement('span');
+        key.className = 'tt-key';
+        key.style.background = bar.dataset.color;
+        tooltip.textContent = '';
+        tooltip.appendChild(key);
+        tooltip.appendChild(document.createTextNode(bar.dataset.series + ', ' + bar.dataset.day + ': '));
+        const val = document.createElement('span');
+        val.className = 'tt-val';
+        val.textContent = bar.dataset.value;
+        tooltip.appendChild(val);
+
+        const barRect = bar.getBoundingClientRect();
+        const plotRect = chart.closest('.chart-plot').getBoundingClientRect();
+        tooltip.style.left = (barRect.left - plotRect.left + barRect.width / 2) + 'px';
+        tooltip.style.top = (barRect.top - plotRect.top) + 'px';
+        tooltip.classList.add('show');
+      }
+      function hideTooltip(){ tooltip.classList.remove('show'); }
+
+      chart.querySelectorAll('.bar').forEach(function(bar){
+        bar.setAttribute('aria-label', bar.dataset.series + ' ' + bar.dataset.day + ': ' + bar.dataset.value);
+        bar.addEventListener('mouseenter', function(){ showTooltip(bar); });
+        bar.addEventListener('mouseleave', hideTooltip);
+        bar.addEventListener('focus', function(){ showTooltip(bar); });
+        bar.addEventListener('blur', hideTooltip);
+      });
+    })();
+
+    // Additional interactivity
+    document.addEventListener('DOMContentLoaded', function(){
+      // User menu toggle
+      const userChip = document.getElementById('userChip');
+      const userMenu = document.getElementById('userMenu');
+
+      if(userChip && userMenu) {
+        userChip.addEventListener('click', function(e){
+          e.stopPropagation();
+          userMenu.classList.toggle('open');
+          console.log('User menu clicked, open:', userMenu.classList.contains('open'));
+        });
+
+        // Close menu on outside click
+        document.addEventListener('click', function(e){
+          if(!userChip.contains(e.target) && !userMenu.contains(e.target)) {
+            userMenu.classList.remove('open');
+          }
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>

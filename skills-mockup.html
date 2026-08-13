@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EG TraceTool — Skills (Redesign)</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --bg-sidebar:#F5F4F2;
+    --bg-hover:#FAFAF8;
+    --radius:10px;
+    --radius-sm:6px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:'Segoe UI', Roboto, Arial, sans-serif;
+    background:var(--bg-page);
+    color:var(--ink-900);
+    display:flex;
+  }
+
+  .sidebar{
+    width:200px;
+    background:var(--bg-sidebar);
+    border-right:1px solid var(--border);
+    padding:24px 0;
+    height:100vh;
+    overflow-y:auto;
+    flex:0 0 200px;
+  }
+  .sidebar-header{
+    padding:0 16px 24px;
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .sidebar-section{margin-bottom:24px;}
+  .sidebar-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 16px;
+    margin:0 8px;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-size:13px;
+    color:var(--ink-700);
+    text-decoration:none;
+    transition:.15s ease;
+  }
+  .sidebar-item:hover{
+    background:var(--bg-hover);
+    color:var(--ink-900);
+  }
+  .sidebar-item.active{
+    background:var(--accent-light);
+    color:var(--accent-dark);
+    font-weight:600;
+  }
+
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  .top-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+  .logo-mark{
+    width:32px;height:32px;border-radius:6px;flex:none;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .logo-mark img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+  .close-btn{
+    width:40px; height:40px; border-radius:50%; border:1px solid var(--border);
+    background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-500); transition:.15s ease;
+  }
+  .close-btn:hover{border-color:var(--ink-400); color:var(--ink-700);}
+
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:24px 32px;
+  }
+
+  .toolbar{
+    display:flex;
+    gap:12px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .toolbar-title{
+    font-size:18px;
+    font-weight:700;
+    color:var(--ink-900);
+    margin:0;
+    flex:1;
+  }
+
+  .toolbar-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .search-box{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+    flex:1;
+    min-width:250px;
+  }
+
+  .search-box input{
+    border:none;
+    outline:none;
+    flex:1;
+    font-size:13px;
+    font-family:inherit;
+    color:var(--ink-900);
+    background:transparent;
+  }
+
+  .search-box input::placeholder{
+    color:var(--ink-400);
+  }
+
+  .btn{
+    padding:10px 16px;
+    border:none;
+    border-radius:var(--radius-sm);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.15s ease;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+  }
+  .btn-primary:hover{
+    background:var(--accent-dark);
+  }
+  .btn-secondary{
+    background:#fff;
+    color:var(--ink-700);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover{
+    background:var(--bg-hover);
+    border-color:var(--ink-400);
+  }
+
+  .table-container{
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    background:#fff;
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+
+  thead{
+    background:var(--bg-hover);
+    border-bottom:1px solid var(--border);
+  }
+
+  th{
+    padding:12px 14px;
+    text-align:left;
+    font-weight:700;
+    color:var(--ink-900);
+    white-space:nowrap;
+  }
+
+  td{
+    padding:12px 14px;
+    border-bottom:1px solid #f0ede8;
+    color:var(--ink-700);
+  }
+
+  tbody tr:hover{
+    background:var(--bg-hover);
+  }
+
+  tbody tr:last-child td{
+    border-bottom:none;
+  }
+
+  .table-actions{
+    display:flex;
+    gap:6px;
+    justify-content:flex-end;
+  }
+
+  .table-actions button{
+    padding:6px 10px;
+    font-size:12px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink-700);
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    transition:.15s ease;
+  }
+
+  .table-actions button:hover{
+    background:var(--bg-hover);
+    border-color:var(--ink-400);
+  }
+
+  .info-box{
+    background:#fef2f0;
+    border:1px solid #f5d4cc;
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    margin-bottom:24px;
+    font-size:13px;
+    color:var(--ink-900);
+  }
+  .info-box strong{font-weight:600;}
+</style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-header">Company</div>
+      <a class="sidebar-item" href="company-settings-mockup.html">General</a>
+      <a class="sidebar-item" href="roles-and-permissions-mockup.html">Roles & Permissions</a>
+      <a class="sidebar-item" href="service-tasks-mockup.html">Service Tasks</a>
+      <a class="sidebar-item active" href="skills-mockup.html">Skills</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Data</div>
+      <a class="sidebar-item" href="module-categories-mockup.html">Module Categories</a>
+      <a class="sidebar-item" href="imports-mockup.html">Imports</a>
+      <a class="sidebar-item" href="departments-mockup.html">Departments</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-header">Admin</div>
+      <a class="sidebar-item" href="administrator-users-mockup.html">Administrator Users</a>
+      <a class="sidebar-item" href="integration-mockup.html">Integration</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top-nav">
+      <div class="brand">
+        <div class="logo-mark">
+          <img src="assets/logo.png" alt="EG TraceTool">
+        </div>
+        Skills
+      </div>
+      <a href="index.html" class="close-btn" title="Close" style="text-decoration:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </a>
+    </div>
+
+    <div class="content">
+      <div class="info-box">
+        <strong>Manage employee skills and competencies for your organization.</strong>
+      </div>
+
+      <div class="toolbar">
+        <h2 class="toolbar-title">Skills</h2>
+        <button class="btn btn-primary" onclick="createSkill()">+ Create new skill</button>
+      </div>
+
+      <div class="search-box" style="margin-bottom:24px; max-width:350px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" placeholder="Search skills...">
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Number of employees</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Forstahelsjælp</td>
+              <td>6</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Kalb af Toj</td>
+              <td>6</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Kareskort</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Kareskort B</td>
+              <td>6</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>LAUS-ENO8110 - Elektriske installationer</td>
+              <td>1</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>nervone</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Pas på på banen</td>
+              <td>6</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Pers, sikkerhed v arbejde med epoxy og isocyanater</td>
+              <td>1</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Rolle- og Bukkestilads</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Skilldemo1</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Skillads</td>
+              <td>0</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Svejtespas</td>
+              <td>1</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Teleskopkrasser</td>
+              <td>0</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>TEST</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Varmt arbejde (DBH)</td>
+              <td>2</td>
+              <td style="text-align:right;">
+                <div class="table-actions">
+                  <button onclick="editSkill()">✎ Edit</button>
+                  <button onclick="deleteSkill()">🗑 Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:24px; padding:12px; background:var(--bg-hover); border-radius:var(--radius-sm); font-size:12px; color:var(--ink-500);">
+        Number of skills: 15
+      </div>
+
+    </div>
+  </div>
+
+<script>
+function createSkill(){
+  }
+
+function editSkill(){
+  }
+
+function deleteSkill(){
+  }
+</script>
+
+
+<script>
+// Sidebar navigation - update active state
+const currentFile = window.location.pathname.split('/').pop();
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  const href = item.getAttribute('href');
+  if(href === currentFile) {
+    item.classList.add('active');
+  } else {
+    item.classList.remove('active');
+  }
+});
+</script>
+
+</body>
+</html>
+
