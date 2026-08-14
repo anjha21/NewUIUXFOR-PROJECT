@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EG TraceTool — Hand Out Equipment</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --hover-bg:#F5F4F2;
+    --bg-subtle:#F9F8F7;
+    --radius:6px;
+    --shadow-sm:0 1px 3px rgba(20,22,27,0.06);
+    --warn:#B7791F;
+    --warn-bg:#FBF1DD;
+  }
+
+  *{box-sizing:border-box;}
+  html, body{margin:0; height:100%; overflow:hidden; background:var(--bg-page);}
+  body{font-family:'Segoe UI', Roboto, -apple-system, sans-serif; color:var(--ink-900); font-size:12px; display:flex; flex-direction:column; line-height:1.5;}
+  svg{display:block; flex-shrink:0;}
+  button{font-family:inherit; cursor:pointer;}
+
+  /* HEADER */
+  .header{
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    padding:0 16px;
+    height:48px;
+    gap:16px;
+  }
+
+  .header-left{display:flex; align-items:center; gap:10px; min-width:0;}
+  .logo{
+    width:20px;
+    height:20px;
+    border-radius:3px;
+    background:url('assets/logo.png') center/cover no-repeat, linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+    flex-shrink:0;
+  }
+  .app-name{font-size:13px; font-weight:600; color:var(--ink-900); white-space:nowrap;}
+  .page-title{flex:1; font-size:13px; font-weight:500; color:var(--ink-700); text-align:right; margin-right:20px; min-width:0;}
+
+  .header-right{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .btn{
+    border:none;
+    border-radius:var(--radius);
+    font-size:11px;
+    font-weight:600;
+    height:32px;
+    padding:0 14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:all 0.2s;
+  }
+
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary:disabled{background:var(--ink-400); cursor:not-allowed;}
+
+  .btn-close{
+    width:32px;
+    height:32px;
+    padding:0;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink-500);
+    border-radius:50%;
+  }
+
+  .btn-close:hover{border-color:var(--ink-400); color:var(--ink-700);}
+
+  .divider{width:1px; height:16px; background:var(--border);}
+
+  /* MAIN LAYOUT */
+  .container{
+    display:flex;
+    flex:1;
+    min-height:0;
+    gap:0;
+  }
+
+  /* LEFT PANEL - Equipment Items */
+  .panel-left{
+    width:55%;
+    flex:none;
+    border-right:1px solid var(--border);
+    background:#fff;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0;
+  }
+
+  .panel-left::-webkit-scrollbar{width:6px;}
+  .panel-left::-webkit-scrollbar-track{background:transparent;}
+  .panel-left::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px;}
+
+  /* Equipment Item Card */
+  .equipment-item{
+    padding:12px 14px;
+    border-bottom:1px solid var(--bg-subtle);
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:12px;
+    align-items:start;
+  }
+
+  .equipment-item:hover{background:var(--hover-bg);}
+
+  .equipment-icon{
+    width:40px;
+    height:40px;
+    border-radius:4px;
+    background:var(--bg-subtle);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--ink-400);
+    flex-shrink:0;
+    margin-top:2px;
+  }
+
+  .equipment-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:start;
+    margin-bottom:8px;
+  }
+
+  .equipment-name{
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-900);
+  }
+
+  .equipment-meta{
+    font-size:11px;
+    color:var(--ink-500);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:8px;
+  }
+
+  .equipment-meta-item{
+    display:flex;
+    gap:2px;
+  }
+
+  .equipment-meta-label{
+    font-weight:600;
+    color:var(--ink-500);
+  }
+
+  .equipment-meta-value{
+    color:var(--ink-700);
+  }
+
+  .equipment-fields{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+  }
+
+  .field-small{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .field-small label{
+    font-size:10px;
+    font-weight:600;
+    color:var(--ink-500);
+    margin-bottom:2px;
+  }
+
+  .field-small input, .field-small select{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:4px 6px;
+    font-size:11px;
+    font-family:inherit;
+    color:var(--ink-900);
+  }
+
+  .field-small input:focus, .field-small select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(187, 91, 44, 0.1);
+  }
+
+  .equipment-actions{
+    flex-shrink:0;
+    display:flex;
+    gap:4px;
+  }
+
+  .btn-icon{
+    width:24px;
+    height:24px;
+    padding:0;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink-500);
+    border-radius:var(--radius);
+    font-size:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .btn-icon:hover{border-color:var(--ink-400); color:var(--ink-700);}
+
+  .warn-badge{
+    background:var(--warn-bg);
+    color:var(--warn);
+    padding:2px 6px;
+    border-radius:3px;
+    font-size:10px;
+    font-weight:600;
+  }
+
+  /* RIGHT PANEL - Common Form */
+  .panel-right{
+    width:45%;
+    overflow-y:auto;
+    padding:16px;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .panel-right::-webkit-scrollbar{width:6px;}
+  .panel-right::-webkit-scrollbar-track{background:transparent;}
+  .panel-right::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px;}
+
+  .summary-bar{
+    padding:10px 12px;
+    background:var(--bg-subtle);
+    border-radius:var(--radius);
+    margin-bottom:16px;
+    font-size:12px;
+    color:var(--ink-700);
+  }
+
+  .summary-bar strong{
+    color:var(--ink-900);
+    font-weight:600;
+  }
+
+  /* SECTIONS */
+  .form-section{margin-bottom:18px;}
+  .form-section:last-child{margin-bottom:0;}
+
+  .section-header{
+    font-size:10px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    letter-spacing:0.3px;
+    margin-bottom:10px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--bg-subtle);
+  }
+
+  /* FORM FIELDS */
+  .field-group{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;}
+  .field-group.single{grid-template-columns:1fr;}
+
+  .field{display:flex; flex-direction:column;}
+
+  .field-label{
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink-700);
+    margin-bottom:4px;
+  }
+
+  .field-label.required::after{content:" *"; color:var(--accent);}
+
+  .field-input, select, textarea{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:6px 8px;
+    font-size:12px;
+    font-family:inherit;
+    color:var(--ink-900);
+    transition:all 0.2s;
+  }
+
+  .field-input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(187, 91, 44, 0.1);
+  }
+
+  select{
+    appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 6px center;
+    background-size:12px;
+    padding-right:24px;
+  }
+
+  textarea{
+    resize:vertical;
+    min-height:100px;
+    font-family:inherit;
+  }
+
+  .checkbox-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:8px;
+  }
+
+  .checkbox-group input{
+    width:14px;
+    height:14px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+
+  .checkbox-group label{
+    font-size:11px;
+    color:var(--ink-700);
+    cursor:pointer;
+    margin:0;
+  }
+
+  /* EMPTY STATE */
+  .empty-state{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+    color:var(--ink-400);
+    text-align:center;
+  }
+
+  .empty-state-icon{
+    font-size:32px;
+    margin-bottom:12px;
+    opacity:0.5;
+  }
+
+  .empty-state-text{
+    font-size:12px;
+    color:var(--ink-500);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1200px) {
+    .panel-left{width:50%;}
+    .panel-right{width:50%;}
+  }
+
+  @media (max-width: 900px) {
+    .container{flex-direction:column;}
+    .panel-left{
+      width:100%;
+      border-right:none;
+      border-bottom:1px solid var(--border);
+      max-height:45%;
+    }
+    .panel-right{width:100%;}
+    .equipment-fields{grid-template-columns:1fr 1fr;}
+  }
+
+  @media (max-width: 600px) {
+    .header{padding:0 12px;}
+    .panel-left, .panel-right{padding:10px;}
+    .app-name{display:none;}
+    .field-group{grid-template-columns:1fr;}
+    .equipment-fields{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo"></div>
+      <span class="app-name">EG TraceTool</span>
+    </div>
+    <div class="page-title">Hand Out Equipment</div>
+    <div class="header-right">
+      <button class="btn btn-primary" id="handOutBtn" onclick="submitHandOut()" disabled>Hand out</button>
+      <div class="divider"></div>
+      <button class="btn-close" title="Cancel" onclick="goBack()">✕</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- LEFT PANEL: Equipment Items -->
+    <div class="panel-left" id="equipmentList">
+      <!-- Equipment items will be populated here -->
+    </div>
+
+    <!-- RIGHT PANEL: Hand Out Form -->
+    <div class="panel-right">
+      <div class="summary-bar">
+        <span id="summaryText">No equipment selected</span>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">In the period</div>
+        <div class="field-group">
+          <div class="field">
+            <label class="field-label required">Hand out date</label>
+            <input type="date" class="field-input" id="handOutDate">
+          </div>
+          <div class="field">
+            <label class="field-label required">Time</label>
+            <input type="time" class="field-input" id="handOutTime">
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <label class="field-label">Expected hand in date</label>
+            <input type="date" class="field-input" id="expectedHandInDate">
+          </div>
+          <div class="field">
+            <label class="field-label">Time</label>
+            <input type="time" class="field-input" id="expectedHandInTime">
+          </div>
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="noExpectedHandIn" onchange="toggleExpectedDate()">
+          <label for="noExpectedHandIn">No expected hand in date</label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">To</div>
+        <div class="field-group single">
+          <div class="field">
+            <label class="field-label required">Handed out to</label>
+            <select id="handedOutTo">
+              <option value="">Select person or department...</option>
+              <option value="jens_hansen">Jens Hansen</option>
+              <option value="khyathi_kulal">Khyathi Kulal</option>
+              <option value="roshan_kali">Roshan Kali</option>
+              <option value="test_person">Test Person</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group single">
+          <div class="field">
+            <label class="field-label required">Hand out by</label>
+            <select id="handOutBy">
+              <option value="">Select employee...</option>
+              <option value="jens_hansen">Jens Hansen</option>
+              <option value="khyathi_kulal">Khyathi Kulal</option>
+              <option value="roshan_kali">Roshan Kali</option>
+              <option value="test_person">Test Person</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">Comments</div>
+        <div class="field-group single">
+          <div class="field">
+            <textarea class="field-input" id="handOutComments" placeholder="Add any notes about this hand out..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let selectedEquipment = new Map();
+  let allEquipment = [];
+
+  // Sample equipment data
+  const sampleEquipment = [
+    {
+      id: '2046',
+      name: 'Hilti Reciprocating saw Test',
+      barcode: '1002730',
+      department: 'TraceTool A',
+      warehouse: 'Odense',
+      quantity: 1,
+      amount: '0 pcs'
+    },
+    {
+      id: '2343',
+      name: '4A Washing facilities Descc multi',
+      barcode: '1002766',
+      department: 'TraceTool A/S',
+      warehouse: 'Odense',
+      quantity: 1,
+      amount: '0 pcs'
+    },
+    {
+      id: '2924',
+      name: 'A&N Alligator saw Tc b f',
+      barcode: '1002668',
+      department: 'TraceTool A',
+      warehouse: 'Timburhus',
+      quantity: 1,
+      amount: '8 kg'
+    },
+    {
+      id: '2923',
+      name: '4A Washing facilities Desc',
+      barcode: '1002671',
+      department: 'TraceTool A',
+      warehouse: 'Odense',
+      quantity: 1,
+      amount: 'p pcs'
+    }
+  ];
+
+  function cleanText(text) {
+    if (!text) return '—';
+    return text.toString().trim().replace(/^—$/, '');
+  }
+
+  function loadEquipmentList() {
+    // Check if we have equipment IDs to load from URL
+    const params = new URLSearchParams(window.location.search);
+    const equipmentIds = params.get('ids')?.split(',') || [];
+
+    if (equipmentIds.length > 0) {
+      // Try to load from sessionStorage first (populated by Equipment list)
+      equipmentIds.forEach(id => {
+        const storedData = sessionStorage.getItem('equipmentData_' + id);
+        if (storedData) {
+          try {
+            const data = JSON.parse(storedData);
+            // Convert to our equipment format
+            const equipment = {
+              id: data.equipmentNo || id,
+              name: data.equipmentGroup || 'Unknown Equipment',
+              barcode: data.barcode || '—',
+              department: data.department || '—',
+              warehouse: data.warehouse || 'Odense',
+              quantity: 1,
+              amount: '0 pcs'
+            };
+            allEquipment.push(equipment);
+          } catch (e) {
+            console.error('Error parsing equipment data', e);
+          }
+        }
+      });
+    }
+
+    // If no equipment loaded from sessionStorage, use sample data
+    if (allEquipment.length === 0) {
+      allEquipment = sampleEquipment;
+    }
+
+    renderEquipmentList();
+    setDefaultDate();
+  }
+
+  function renderEquipmentList() {
+    const listEl = document.getElementById('equipmentList');
+
+    if (allEquipment.length === 0) {
+      listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">No equipment selected</div></div>';
+      return;
+    }
+
+    listEl.innerHTML = allEquipment.map((item) => `
+      <div class="equipment-item" id="item-${item.id}">
+        <div class="equipment-icon">📦</div>
+        <div>
+          <div class="equipment-header">
+            <div class="equipment-name">${item.name}</div>
+          </div>
+          <div class="equipment-meta">
+            <div class="equipment-meta-item"><span class="equipment-meta-label">No.:</span> <span class="equipment-meta-value">${item.id}</span></div>
+            <div class="equipment-meta-item"><span class="equipment-meta-label">Barcode:</span> <span class="equipment-meta-value">${item.barcode}</span></div>
+            <div class="equipment-meta-item"><span class="equipment-meta-label">Dept:</span> <span class="equipment-meta-value">${item.department}</span></div>
+            <div class="equipment-meta-item"><span class="equipment-meta-label">Warehouse:</span> <span class="equipment-meta-value">${item.warehouse}</span></div>
+          </div>
+          <div class="equipment-fields">
+            <div class="field-small">
+              <label>Warehouse</label>
+              <select data-field="warehouse" data-id="${item.id}">
+                <option value="Odense">Odense</option>
+                <option value="Oslo">Oslo 1</option>
+                <option value="Mangalore">Mangalore</option>
+                <option value="Timbur">Timbur</option>
+              </select>
+            </div>
+            <div class="field-small">
+              <label>Quantity</label>
+              <input type="number" data-field="quantity" data-id="${item.id}" value="${item.quantity}" min="1">
+            </div>
+            <div class="field-small">
+              <label>Amount</label>
+              <input type="text" data-field="amount" data-id="${item.id}" value="${item.amount}" placeholder="e.g., 8 kg">
+            </div>
+          </div>
+        </div>
+        <div class="equipment-actions">
+          <button class="btn-icon" title="Replace" onclick="handleReplace('${item.id}')">↻</button>
+        </div>
+      </div>
+    `).join('');
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const count = allEquipment.length;
+    const summaryEl = document.getElementById('summaryText');
+    const handOutBtn = document.getElementById('handOutBtn');
+
+    if (count === 0) {
+      summaryEl.textContent = 'No equipment selected';
+      handOutBtn.disabled = true;
+    } else if (count === 1) {
+      summaryEl.innerHTML = `<strong>1</strong> equipment selected`;
+      handOutBtn.disabled = false;
+    } else {
+      summaryEl.innerHTML = `<strong>${count}</strong> equipment items selected`;
+      handOutBtn.disabled = false;
+    }
+  }
+
+  function setDefaultDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('handOutDate').value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('handOutTime').value = '09:00';
+  }
+
+  function toggleExpectedDate() {
+    const isChecked = document.getElementById('noExpectedHandIn').checked;
+    document.getElementById('expectedHandInDate').disabled = isChecked;
+    document.getElementById('expectedHandInTime').disabled = isChecked;
+    if (isChecked) {
+      document.getElementById('expectedHandInDate').value = '';
+      document.getElementById('expectedHandInTime').value = '';
+    }
+  }
+
+  function handleReplace(equipmentId) {
+    alert(`Replace functionality for equipment ${equipmentId}`);
+  }
+
+  function submitHandOut() {
+    if (allEquipment.length === 0) {
+      alert('Please select at least one equipment to hand out');
+      return;
+    }
+
+    const handOutDate = document.getElementById('handOutDate').value;
+    const handOutTime = document.getElementById('handOutTime').value;
+    const handedOutTo = document.getElementById('handedOutTo').value;
+    const handOutBy = document.getElementById('handOutBy').value;
+
+    if (!handOutDate) {
+      alert('Please select hand out date');
+      return;
+    }
+    if (!handOutTime) {
+      alert('Please select hand out time');
+      return;
+    }
+    if (!handedOutTo) {
+      alert('Please select who the equipment is handed out to');
+      return;
+    }
+    if (!handOutBy) {
+      alert('Please select who is handing out the equipment');
+      return;
+    }
+
+    // Collect per-item warehouse and quantity
+    const items = allEquipment.map(item => {
+      const warehouseField = document.querySelector(`[data-field="warehouse"][data-id="${item.id}"]`);
+      const quantityField = document.querySelector(`[data-field="quantity"][data-id="${item.id}"]`);
+      const amountField = document.querySelector(`[data-field="amount"][data-id="${item.id}"]`);
+
+      return {
+        id: item.id,
+        name: item.name,
+        warehouse: warehouseField?.value || item.warehouse,
+        quantity: quantityField?.value || item.quantity,
+        amount: amountField?.value || item.amount
+      };
+    });
+
+    const itemsList = items.map(i => `${i.id} (${i.warehouse})`).join(', ');
+    alert(`${items.length} equipment item(s) handed out:\n${itemsList}\n\nDate: ${handOutDate}\nTo: ${handedOutTo}\nBy: ${handOutBy}`);
+    goBack();
+  }
+
+  function goBack() {
+    window.location.href = 'equipment-mockup.html';
+  }
+
+  document.addEventListener('DOMContentLoaded', loadEquipmentList);
+</script>
+</body>
+</html>

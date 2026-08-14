@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EG TraceTool — Service Tasks Equipment</title>
+<style>
+  :root{
+    --accent:#BB5B2C;
+    --accent-dark:#9A4A22;
+    --accent-light:#F4E7DE;
+    --ink-900:#14161B;
+    --ink-700:#45505C;
+    --ink-500:#6B7280;
+    --ink-400:#9AA1A9;
+    --border:#E4E1DD;
+    --bg-page:#FFFFFF;
+    --hover-bg:#F5F4F2;
+    --bg-subtle:#F9F8F7;
+    --warn:#B7791F;
+    --warn-bg:#FBF1DD;
+    --success:#2E8B57;
+    --success-bg:#E7F5EC;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;overflow:hidden;}
+  body{font-family:'Segoe UI', Roboto, Arial, sans-serif; background:var(--bg-page); color:var(--ink-900); font-size:13.5px; display:flex; flex-direction:column;}
+  svg{display:block;}
+  button{font-family:inherit;}
+
+  .top-nav{
+    display:flex; align-items:center; gap:28px; flex:none;
+    background:#fff; border-bottom:1px solid var(--border);
+    padding:0 24px; height:56px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; cursor:pointer;}
+  .logo-mark{
+    width:24px;height:24px;border-radius:6px;flex:none;
+    background:url('assets/logo.png') center/cover no-repeat, linear-gradient(135deg, var(--accent) 50%, var(--accent-dark) 50%);
+  }
+  .nav-tabs{display:flex; gap:4px; height:100%;}
+  .nav-tab{
+    display:flex;align-items:center;height:100%;padding:0 14px;
+    font-size:13.5px; font-weight:600; color:var(--ink-500); border-bottom:2px solid transparent;
+    cursor:pointer;
+  }
+  .nav-tab.active{color:var(--ink-900); border-bottom-color:var(--accent);}
+  .top-nav-right{margin-left:auto; display:flex; align-items:center; gap:18px;}
+  .user-chip{display:flex; align-items:center; gap:8px; padding-left:14px; border-left:1px solid var(--border); cursor:pointer;}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-light); color:var(--accent-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;}
+  .user-chip .name{font-size:13px;font-weight:600;}
+
+  .layout{display:flex; align-items:stretch; flex:1; min-height:0;}
+
+  .icon-sidebar{
+    width:116px; flex:none; background:#fff; border-right:1px solid var(--border);
+    padding:18px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; overflow-y:auto;
+  }
+  .icon-nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:5px; padding:6px 2px;
+    border-radius:6px; cursor:pointer; text-align:center; width:100%;
+  }
+  .icon-nav-item .icon-tile{
+    width:36px; height:36px; border-radius:10px; flex:none;
+    display:flex; align-items:center; justify-content:center; color:var(--ink-500);
+    transition:background .12s ease, color .12s ease;
+  }
+  .icon-nav-item .label{font-size:10.5px; font-weight:600; color:var(--ink-700); line-height:1.2;}
+  .icon-nav-item:hover .icon-tile{background:var(--hover-bg);}
+  .icon-nav-item.active .icon-tile{background:var(--accent-light); color:var(--accent-dark);}
+  .icon-nav-item.active .label{color:var(--accent-dark);}
+
+  .content-area{flex:1; min-width:0; display:flex; flex-direction:column; min-height:0;}
+  .content-header{position:relative; flex:none; padding:20px 24px 14px; border-bottom:1px solid var(--border); background:#fff;}
+  .content-header h1{font-size:19px; margin:0 0 14px;}
+  .toolbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .search-box{
+    display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border);
+    border-radius:6px; padding:8px 12px; flex:1; min-width:220px; max-width:420px;
+  }
+  .search-box input{border:none;outline:none;font-size:13px;width:100%;font-family:inherit;color:var(--ink-900);}
+  .tbtn{
+    display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border);
+    border-radius:6px; padding:8px 12px; font-size:12.5px; font-weight:600; color:var(--ink-700); cursor:pointer;
+  }
+  .tbtn:hover{border-color:var(--ink-400);}
+
+  .tabs-container{
+    display:flex;
+    gap:0;
+    padding:0 24px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    font-size:11px;
+    align-items:center;
+  }
+
+  .tab-group{
+    display:flex;
+    gap:0;
+    align-items:center;
+  }
+
+  .tab-group.planned{
+    border-right:1px solid var(--border);
+    padding-right:24px;
+    margin-right:24px;
+  }
+
+  .tab-section-label{
+    padding:12px 16px;
+    font-weight:700;
+    color:var(--ink-500);
+    text-transform:uppercase;
+    font-size:10px;
+    letter-spacing:0.03em;
+    margin-right:8px;
+    white-space:nowrap;
+  }
+
+  .tab{
+    padding:12px 14px;
+    border:none;
+    background:transparent;
+    color:var(--ink-500);
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all 0.2s;
+    white-space:nowrap;
+  }
+
+  .tab:hover{
+    color:var(--ink-700);
+  }
+
+  .tab.active{
+    color:var(--accent);
+    border-bottom-color:var(--accent);
+  }
+
+  .table-scroll{flex:1; overflow:auto; background:#fff;}
+  table{border-collapse:collapse; width:max-content; min-width:100%;}
+
+  thead th{
+    position:sticky; top:0; z-index:2;
+    text-align:left; font-size:10px; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--ink-500); font-weight:700; padding:9px 10px; background:#FAF9F7;
+    border-bottom:1px solid var(--border); white-space:nowrap;
+    border-right:1px solid var(--border);
+  }
+
+  tbody td{
+    padding:8px 10px; font-size:12px; color:var(--ink-700); border-bottom:1px solid #F0EEEB;
+    white-space:nowrap; border-right:1px solid #F0EEEB;
+  }
+
+  tbody tr:hover td{background:#FBFAF9;}
+
+  .status-badge{
+    display:inline-block;
+    padding:2px 6px;
+    border-radius:3px;
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+
+  .status-pending{
+    background:var(--warn-bg);
+    color:var(--warn);
+  }
+
+  .status-completed{
+    background:var(--success-bg);
+    color:var(--success);
+  }
+
+  .status-bar{
+    flex:none; display:flex; align-items:center; justify-content:space-between;
+    padding:9px 24px; border-top:1px solid var(--border); background:#fff;
+    font-size:12px; color:var(--ink-500);
+  }
+  .status-bar b{color:var(--ink-900);}
+</style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div class="brand" onclick="window.location.href='dashboard-mockup.html'">
+      <div class="logo-mark"></div>
+      EG TraceTool
+    </div>
+    <div class="nav-tabs">
+      <div class="nav-tab" onclick="window.location.href='dashboard-mockup.html'">Frontpage</div>
+      <div class="nav-tab active" onclick="window.location.href='equipment-mockup.html'">Equipment</div>
+      <div class="nav-tab">Modules</div>
+      <div class="nav-tab">Projects</div>
+      <div class="nav-tab">Employees</div>
+      <div class="nav-tab">Reports</div>
+    </div>
+    <div class="top-nav-right">
+      <div class="user-chip" onclick="window.location.href='login-mockup.html'" title="Log out">
+        <div class="avatar">KK</div>
+        <span class="name">Khyathi Kulal</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="icon-sidebar">
+      <div class="icon-nav-item" onclick="window.location.href='equipment-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <span class="label">Search for equipment</span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='equipment-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></div>
+        <span class="label">Calendar</span>
+      </div>
+      <div class="icon-nav-item active">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.6 2.6-2-2z"/></svg></div>
+        <span class="label">Service tasks</span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='equipment-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3z"/><path d="M4 20l1-4"/></svg></div>
+        <span class="label">Mass edit</span>
+      </div>
+      <div class="icon-nav-item" onclick="window.location.href='equipment-mockup.html'">
+        <div class="icon-tile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></div>
+        <span class="label">Orderlists</span>
+      </div>
+    </aside>
+
+    <div class="content-area">
+      <div class="content-header">
+        <h1>Service tasks</h1>
+        <div class="toolbar">
+          <div class="search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" placeholder="Search equipment, task, type…" id="searchInput" onkeyup="filterTasks()">
+          </div>
+          <button class="tbtn" onclick="alert('More search options')">
+            More search options
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <button class="tbtn" onclick="location.reload()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v6h6"/><path d="M20 20v-6h-6"/><path d="M5.5 9a7 7 0 0112-3.5L20 8M4 16l2.5 2.5A7 7 0 0018.5 15"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="tabs-container">
+        <div class="tab-group planned">
+          <span class="tab-section-label">Planned service tasks</span>
+          <button class="tab" onclick="switchTab('planned-all', this)">All</button>
+          <button class="tab" onclick="switchTab('planned-exceeded', this)">Exceeded</button>
+          <button class="tab active" onclick="switchTab('planned-planned', this)">Planned</button>
+        </div>
+        <div class="tab-group active">
+          <span class="tab-section-label">Active service tasks</span>
+          <button class="tab" onclick="switchTab('active-inprogress', this)">In progress</button>
+          <button class="tab" onclick="switchTab('active-completed', this)">Completed</button>
+        </div>
+      </div>
+
+      <div class="table-scroll" id="tasksTableScroll"></div>
+      <div class="status-bar" id="statusBar"></div>
+    </div>
+  </div>
+
+<script>
+  let currentTab = 'planned-planned';
+  let allTasks = [];
+
+  const serviceTasks = [
+    {equipmentNo: '1539', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-PE', department: 'TraceTool A/S', status: 'Handed out', type: 'Service form', interval: '1 day', latestService: '2026-08-20', nextService: '2026-08-20', taskStatus: 'pending', responsible: 'Bent Larsen', barcode: '1539', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1278', group: 'Cordless recipr', manufacturer: 'A. B. Chance', description: 'sdf', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service form', interval: '1 day', latestService: '2026-08-20', nextService: '2026-08-20', taskStatus: 'pending', responsible: '', barcode: '1000389', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1258', group: 'Assembly f', manufacturer: 'NST', description: 'Mälertavle 250A', department: '430', status: 'In stock (Odense', type: 'Service', interval: '1 Month', latestService: '2026-08-20', nextService: '2026-09-20', taskStatus: 'pending', responsible: '', barcode: '1000356', warehouse: 'Odense', placement: '964346', state: 'Active'},
+    {equipmentNo: '1134', group: 'Reciprocating s', manufacturer: 'DeWalt', description: 'DW310K', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Month', latestService: '2026-08-20', nextService: '2026-09-20', taskStatus: 'pending', responsible: '', barcode: '1000086', warehouse: 'Odense', placement: '56876576', state: 'Active'},
+    {equipmentNo: '1007', group: 'Inspection cam', manufacturer: 'Milwaukee', description: 'C12 IC AVA-XYZ', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Calibration', interval: '2 Months', latestService: '2026-08-18', nextService: '2026-10-18', taskStatus: 'pending', responsible: '', barcode: '', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1095', group: 'Tile s', manufacturer: 'DeWalt', description: 'DWC410', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Calibration', interval: '1 Year', latestService: '2026-08-31', nextService: '2026-08-31', taskStatus: 'pending', responsible: '', barcode: '1000033', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1116', group: 'Nail gun', manufacturer: 'Hilti', description: 'DX 76-PTR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Calibration', interval: '1 Year', latestService: '2026-08-31', nextService: '2026-08-31', taskStatus: 'pending', responsible: '', barcode: '1000063', warehouse: 'Odense', placement: '5745454545', state: 'Active'},
+    {equipmentNo: '1174', group: 'Cut of saw', manufacturer: 'Hilti', description: 'DSH 900', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: '', barcode: '1000180', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1142', group: 'Cut of saw', manufacturer: 'Hilti', description: 'DSH 900', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: 'Bent Larsen', barcode: '1000105', warehouse: 'Odense', placement: '45654656', state: 'Active'},
+    {equipmentNo: '1502', group: 'Access token', manufacturer: 'RUKO', description: 'Nægle - CalVin', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: 'Benny Jems', barcode: '1502', warehouse: 'Odense', placement: 'CalVin kontor', state: 'Active'},
+    {equipmentNo: '1625', group: 'Reciprocating s', manufacturer: 'AEG', description: 'US 900 XE', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: '', barcode: '1000865', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1765', group: 'Plate shears', manufacturer: 'Makita', description: 'JS1600', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: '', barcode: '1001020', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1183', group: 'Reciprocating s', manufacturer: 'Makita', description: 'HKS 1412', department: 'EL sliding', status: 'Handed out', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: 'Børge Henr', barcode: '1000194', warehouse: 'Odense', placement: '84454544', state: 'Active'},
+    {equipmentNo: '1628', group: 'Reciprocating s', manufacturer: 'AEG', description: 'US 900 XE', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: '', barcode: '1000868', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1628', group: 'Reciprocating s', manufacturer: 'AEG', description: 'US 900 XE', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: '', barcode: '1000868', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1093', group: 'Rotary hammer', manufacturer: 'Hilti', description: 'UD 30', department: 'TraceTool A/S', status: 'Handed out', type: 'Service', interval: '3 Months', latestService: '2026-08-18', nextService: '2026-11-18', taskStatus: 'pending', responsible: 'Bent Larsen', barcode: '1000028', warehouse: 'Odense', placement: '54345545', state: 'Active'},
+    {equipmentNo: '1879', group: 'Combination h', manufacturer: 'Hilti', description: 'TE 40-AVR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Year', latestService: '2026-08-20', nextService: '2026-08-20', taskStatus: 'pending', responsible: '', barcode: '1001162', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1880', group: 'Combination h', manufacturer: 'Hilti', description: 'TE 40-AVR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Year', latestService: '2026-08-21', nextService: '2026-08-21', taskStatus: 'pending', responsible: '', barcode: '1001163', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1112', group: 'Metal handsaw', manufacturer: 'Baier', description: 'EHS2L', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-26', nextService: '2026-08-26', taskStatus: 'pending', responsible: '', barcode: '1000059', warehouse: 'Odense', placement: '1515151512', state: 'Active'},
+    {equipmentNo: '1112', group: 'Metal handsaw', manufacturer: 'Baier', description: 'EHS2L', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Calibration', interval: '6 Months', latestService: '2026-08-26', nextService: '2026-08-26', taskStatus: 'pending', responsible: '', barcode: '1000059', warehouse: 'Odense', placement: '1515151512', state: 'Active'},
+    {equipmentNo: '1882', group: 'Cordless r', manufacturer: 'Hilti', description: 'TE 40', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Year', latestService: '2026-08-26', nextService: '2026-08-26', taskStatus: 'pending', responsible: '', barcode: '1001166', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1884', group: 'Combination h', manufacturer: 'Hilti', description: 'TE 40-AVR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Year', latestService: '2026-08-04', nextService: '2026-08-04', taskStatus: 'pending', responsible: '', barcode: '1001169', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1098', group: 'Universal millin', manufacturer: 'Festool', description: 'CS 50 EB', department: 'TraceTool A/S', status: 'Handed out', type: 'Service', interval: '1 Month', latestService: '2026-08-19', nextService: '2026-08-19', taskStatus: 'pending', responsible: 'Henrik Hans', barcode: '1000029', warehouse: 'Odense', placement: '33ee44445', state: 'Active'},
+    {equipmentNo: '1396', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-P', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-28', nextService: '2026-08-28', taskStatus: 'pending', responsible: '', barcode: '1000596', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1093', group: 'Rotary hammer', manufacturer: 'Hilti', description: 'UD 30', department: 'TraceTool A/S', status: 'Handed out', type: 'Service form', interval: '1 Day', latestService: '2026-08-28', nextService: '2026-08-28', taskStatus: 'pending', responsible: 'Bent Larsen', barcode: '1000028', warehouse: 'Odense', placement: '54345545', state: 'Active'},
+    {equipmentNo: '1887', group: 'Combination h', manufacturer: 'Hilti', description: 'TE 40-AVR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Year', latestService: '2026-08-29', nextService: '2026-08-29', taskStatus: 'pending', responsible: '', barcode: '1887', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1442', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-P', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: '', barcode: '1442', warehouse: 'Odense', placement: '6651651641', state: 'Active'},
+    {equipmentNo: '1129', group: 'Edge router', manufacturer: 'Festool', description: 'OFK 500 Q R3', department: 'TraceTool A/S', status: 'Handed out', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: 'Søren Hans', barcode: '1000078', warehouse: 'Odense', placement: '5464989596', state: 'Active'},
+    {equipmentNo: '1021', group: 'Screw machine', manufacturer: 'Milwaukee', description: 'M12 BD', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: '', barcode: '1000256', warehouse: 'Odense', placement: '6456456456', state: 'Active'},
+    {equipmentNo: '1173', group: 'Combination h', manufacturer: 'Hilti', description: 'TE 40-AVR', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: '', barcode: '1000178', warehouse: 'Odense', placement: '43465', state: 'Active'},
+    {equipmentNo: '1444', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-P', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: '', barcode: '1444', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1768', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-PE', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-18', nextService: '2026-08-18', taskStatus: 'pending', responsible: '', barcode: '1001024', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1769', group: 'Reciprocating s', manufacturer: 'Hilti', description: 'WSR 1250-PE', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-19', nextService: '2026-08-19', taskStatus: 'pending', responsible: '', barcode: '1001025', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1770', group: 'Plate shears', manufacturer: 'Makita', description: 'JS1601', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-19', nextService: '2026-08-19', taskStatus: 'pending', responsible: '', barcode: '1001026', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1771', group: 'Rotary hammer', manufacturer: 'Hilti', description: 'UD 31', department: 'TraceTool A/S', status: 'Handed out', type: 'Service', interval: '6 Months', latestService: '2026-08-19', nextService: '2026-08-19', taskStatus: 'pending', responsible: 'John Smith', barcode: '1001027', warehouse: 'Mangalore', placement: '54345545', state: 'Active'},
+    {equipmentNo: '1772', group: 'Cut of saw', manufacturer: 'Hilti', description: 'DSH 901', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '6 Months', latestService: '2026-08-19', nextService: '2026-08-19', taskStatus: 'pending', responsible: '', barcode: '1001028', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1773', group: 'Impact driver', manufacturer: 'DeWalt', description: 'DCD795C2', department: 'TraceTool A/S', status: 'In stock (Odense', type: 'Service', interval: '1 Month', latestService: '2026-08-20', nextService: '2026-09-20', taskStatus: 'pending', responsible: '', barcode: '1001029', warehouse: 'Odense', placement: '', state: 'Active'},
+    {equipmentNo: '1774', group: 'Jigsaw', manufacturer: 'Festool', description: 'CARVEX PS 420', department: 'TraceTool A/S', status: 'Handed out', type: 'Service', interval: '3 Months', latestService: '2026-08-20', nextService: '2026-11-20', taskStatus: 'pending', responsible: 'Lisa Green', barcode: '1001030', warehouse: 'Mangalore', placement: '', state: 'Active'},
+  ];
+
+  function switchTab(tab, element) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    renderTable();
+  }
+
+  function filterTasks() {
+    renderTable();
+  }
+
+  function renderTable() {
+    const tableScrollEl = document.getElementById('tasksTableScroll');
+    const statusBarEl = document.getElementById('statusBar');
+
+    let filtered = allTasks;
+
+    // Filter by tab
+    if (currentTab.startsWith('planned')) {
+      filtered = filtered.filter(t => t.taskStatus === 'pending');
+    }
+
+    // Filter by search
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    if (searchTerm) {
+      filtered = filtered.filter(t =>
+        t.equipmentNo.toLowerCase().includes(searchTerm) ||
+        t.group.toLowerCase().includes(searchTerm) ||
+        t.type.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (filtered.length === 0) {
+      tableScrollEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--ink-400);">No service tasks found</div>';
+      statusBarEl.innerHTML = '<span>No results found</span>';
+      return;
+    }
+
+    tableScrollEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Equipment no.</th>
+            <th>Equipment group</th>
+            <th>Manufacturer</th>
+            <th>Description</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Interval</th>
+            <th>Latest service</th>
+            <th>Next serviceable</th>
+            <th>Task Status</th>
+            <th>Responsible</th>
+            <th>Barcode</th>
+            <th>Warehouse</th>
+            <th>Placement</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(task => `
+            <tr>
+              <td><strong>${task.equipmentNo}</strong></td>
+              <td>${task.group}</td>
+              <td>${task.manufacturer}</td>
+              <td>${task.description}</td>
+              <td>${task.department}</td>
+              <td>${task.status}</td>
+              <td>${task.type}</td>
+              <td>${task.interval}</td>
+              <td>${task.latestService}</td>
+              <td>${task.nextService}</td>
+              <td><span class="status-badge status-${task.taskStatus}">${task.taskStatus}</span></td>
+              <td>${task.responsible}</td>
+              <td>${task.barcode}</td>
+              <td>${task.warehouse}</td>
+              <td>${task.placement}</td>
+              <td>${task.state}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+
+    statusBarEl.innerHTML = `<span><b>${filtered.length} results</b> were found</span>`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    allTasks = [...serviceTasks];
+    renderTable();
+  });
+</script>
+</body>
+</html>

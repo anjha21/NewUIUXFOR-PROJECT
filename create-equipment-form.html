@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>EG TraceTool — Equipment 2349</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style>
   :root{
     --accent:#BB5B2C;
@@ -70,8 +72,23 @@
   .tab-item:hover{background:var(--hover-bg);}
   .tab-item.active{background:var(--accent-light); color:var(--accent-dark);}
 
-  .form-scroll{flex:1; min-width:0; overflow-y:auto;}
+  .form-scroll{flex:1; min-width:0; overflow-y:auto; display:flex; flex-direction:column;}
   .form-wrap{display:flex; gap:32px; padding:28px 32px; max-width:1200px;}
+
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+  #gps-tracking-tab.active{display:flex; flex-direction:column;}
+
+  .gps-map{flex:1 1 auto; min-height:420px; width:100%; position:relative; overflow:hidden; background:#d9e2e8; border-top:1px solid var(--border);}
+  .gps-map .leaflet-container{width:100%; height:100%; min-height:420px; font-family:'Segoe UI', Roboto, Arial, sans-serif; background:#d9e2e8;}
+  .gps-map .leaflet-control-zoom{margin-top:12px; margin-right:12px;}
+  .gps-map .leaflet-control-zoom a{width:32px; height:32px; line-height:30px; font-size:18px;}
+  .map-loading{position:absolute; inset:0; z-index:999; display:flex; align-items:center; justify-content:center; color:var(--ink-500); background:#eef2f4; font-size:13px;}
+  .gps-map.loaded .map-loading{display:none;}
+
+  .gps-pin{width:34px; height:34px; border-radius:50% 50% 50% 0; background:var(--accent); border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,.35); transform:rotate(-45deg); position:relative;}
+  .gps-pin::after{content:''; position:absolute; width:10px; height:10px; border-radius:50%; background:#fff; top:9px; left:9px;}
+  .gps-popup-title{font-weight:700; margin-bottom:4px;}
   .form-col{flex:1; min-width:0; max-width:460px;}
   .field{margin-bottom:16px;}
   .field label{display:flex; align-items:center; gap:4px; font-size:12.5px; font-weight:600; color:var(--ink-700); margin-bottom:6px;}
@@ -132,15 +149,16 @@
 
   <div class="layout">
     <aside class="tab-sidebar">
-      <div class="tab-item active">Master data</div>
-      <div class="tab-item">Service tasks</div>
-      <div class="tab-item">Files</div>
-      <div class="tab-item">Loan-/rent prices</div>
-      <div class="tab-item">GPS Tracking</div>
-      <div class="tab-item">Links</div>
+      <div class="tab-item active" data-tab="master-data">Master data</div>
+      <div class="tab-item" data-tab="service-tasks">Service tasks</div>
+      <div class="tab-item" data-tab="files">Files</div>
+      <div class="tab-item" data-tab="loan-prices">Loan-/rent prices</div>
+      <div class="tab-item" data-tab="gps-tracking">GPS Tracking</div>
+      <div class="tab-item" data-tab="links">Links</div>
     </aside>
 
     <div class="form-scroll">
+      <div class="tab-content active" id="master-data-tab" style="overflow-y:auto;">
       <div class="form-wrap">
         <div class="form-col">
           <div class="field">
@@ -223,6 +241,44 @@
           </div>
         </div>
       </div>
+      </div>
+
+      <div class="tab-content" id="service-tasks-tab" style="flex:1; min-width:0; overflow-y:auto; background:#fff; padding:20px 32px;">
+        <h3 style="margin:0 0 12px 0; padding:8px 12px; background:var(--border); color:var(--ink-900); font-size:12px; font-weight:600;">Overdue service tasks</h3>
+        <table style="width:100%; border-collapse:collapse; background:#fff; margin-bottom:32px;">
+          <thead><tr style="background:#FAF9F7; border-bottom:1px solid var(--border);"><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">Latest service</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">Service name</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Type</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border);"><td colspan="3" style="padding:20px 14px; text-align:center; color:var(--ink-400); font-size:12px;">No overdue service tasks</td></tr></tbody>
+          </table>
+        <h3 style="margin:0 0 12px 0; padding:8px 12px; background:var(--border); color:var(--ink-900); font-size:12px; font-weight:600;">Upcoming service tasks</h3>
+        <table style="width:100%; border-collapse:collapse; background:#fff;"><thead><tr style="background:#FAF9F7; border-bottom:1px solid var(--border);"><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">Next service</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">Service name</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase;">Type</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border);"><td colspan="3" style="padding:20px 14px; text-align:center; color:var(--ink-400); font-size:12px;">No upcoming service tasks</td></tr></tbody></table>
+      </div>
+
+      <div class="tab-content" id="files-tab" style="flex:1; min-width:0; overflow-y:auto; background:#fff; padding:20px 32px;">
+        <h3 style="margin:0 0 16px 0; font-size:14px; font-weight:700; color:var(--ink-900);">Files</h3>
+        <table style="width:100%; border-collapse:collapse; background:#fff;"><thead><tr style="background:#FAF9F7; border-bottom:1px solid var(--border);"><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">Attachment name</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase;">File name</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border);"><td colspan="2" style="padding:20px 14px; text-align:center; color:var(--ink-400); font-size:12px;">No files attached</td></tr></tbody></table>
+        <div style="margin-top:16px;"><button class="btn btn-ghost">Add file…</button></div>
+      </div>
+
+      <div class="tab-content" id="loan-prices-tab" style="flex:1; min-width:0; overflow-y:auto; background:#fff; padding:20px 32px;">
+        <h3 style="margin:0 0 16px 0; font-size:14px; font-weight:700; color:var(--ink-900);">Loan-/rent prices</h3>
+        <table style="width:100%; border-collapse:collapse; background:#fff;"><thead><tr style="background:#FAF9F7; border-bottom:1px solid var(--border);"><th style="padding:10px 14px; text-align:center; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">HOUR</th><th style="padding:10px 14px; text-align:center; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">DAY</th><th style="padding:10px 14px; text-align:center; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">WEEK</th><th style="padding:10px 14px; text-align:center; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border);">MONTH</th><th style="padding:10px 14px; text-align:center; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase;">YEAR</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border);"><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="number" placeholder="0.00" style="width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; font-size:12px;"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="number" placeholder="0.00" style="width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; font-size:12px;"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="number" placeholder="0.00" style="width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; font-size:12px;"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="number" placeholder="0.00" style="width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; font-size:12px;"></td><td style="padding:12px 14px; text-align:center;"><input type="number" placeholder="0.00" style="width:100%; border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; font-size:12px;"></td></tr><tr style="border-bottom:1px solid var(--border);"><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="checkbox"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="checkbox"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="checkbox"></td><td style="padding:12px 14px; text-align:center; border-right:1px solid var(--border);"><input type="checkbox"></td><td style="padding:12px 14px; text-align:center;"><input type="checkbox"></td></tr></tbody></table>
+        <p style="margin-top:12px; font-size:11.5px; color:var(--ink-500);">Select which time interval that should be required for this equipment.</p>
+      </div>
+
+      <div class="tab-content" id="gps-tracking-tab" style="flex:1; min-width:0; overflow:hidden; background:#fff;">
+        <div style="flex:none; padding:20px 32px 16px 32px;">
+          <h3 style="margin:0 0 16px 0; font-size:14px; font-weight:700; color:var(--ink-900);">GPS Tracking</h3>
+          <label style="display:block; font-size:12.5px; font-weight:600; color:var(--ink-700); margin-bottom:6px;">Kealtech GPS IMEI</label>
+          <div style="display:flex; gap:8px;"><input type="text" placeholder="Enter IMEI number" style="flex:1; border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; font-size:13px; color:var(--ink-900);"/><button class="btn btn-primary" type="button" onclick="showRandomGpsLocation()">Save</button></div>
+        </div>
+        <div id="gpsMap" class="gps-map"><div class="map-loading">Loading world map…</div></div>
+        <div style="flex:none; padding:12px 32px; background:#fff; border-top:1px solid var(--border);"><p style="margin:0; font-size:11px; color:var(--ink-500);">GPS tracking powered by Kealtech — Map data © OpenStreetMap contributors</p></div>
+      </div>
+
+      <div class="tab-content" id="links-tab" style="flex:1; min-width:0; overflow-y:auto; background:#fff; padding:20px 32px;">
+        <h3 style="margin:0 0 16px 0; font-size:14px; font-weight:700; color:var(--ink-900);">Links</h3>
+        <table style="width:100%; border-collapse:collapse; background:#fff;"><thead><tr style="background:#FAF9F7; border-bottom:1px solid var(--border);"><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase; border-right:1px solid var(--border); width:25%;">Name</th><th style="padding:10px 14px; text-align:left; font-size:10px; font-weight:700; color:var(--ink-500); text-transform:uppercase;">URL</th></tr></thead><tbody><tr style="border-bottom:1px solid var(--border);"><td colspan="2" style="padding:20px 14px; text-align:center; color:var(--ink-400); font-size:12px;">No links added</td></tr></tbody></table>
+        <div style="margin-top:16px;"><button class="btn btn-ghost">Add link…</button></div>
+      </div>
     </div>
   </div>
 
@@ -231,39 +287,23 @@ document.addEventListener('DOMContentLoaded', function(){
   // Tab items
   document.querySelectorAll('.tab-item').forEach(tab => {
     tab.addEventListener('click', function(){
+      const tabName = this.dataset.tab;
       document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
       this.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+        if(content.style.flexDirection) content.style.flexDirection = '';
       });
-  });
-
-  // Action buttons
-  const saveBtn = document.querySelector('.btn-primary');
-  const closeBtn = document.querySelector('.close-btn');
-
-  saveBtn?.addEventListener('click', function(){
+      const targetTab = document.getElementById(tabName + '-tab');
+      if (targetTab) {
+        targetTab.style.display = tabName === 'gps-tracking' ? 'flex' : 'block';
+        if (tabName === 'gps-tracking') {
+          targetTab.style.flexDirection = 'column';
+          initGpsMap();
+          resizeGpsMap();
+        }
+      }
     });
-
-  closeBtn?.addEventListener('click', function(){
-    });
-
-  // Other buttons
-  document.querySelectorAll('.btn-ghost').forEach(btn => {
-    btn.addEventListener('click', function(){
-      });
-  });
-
-  // Upload buttons
-  document.querySelectorAll('button').forEach(btn => {
-    if(btn.textContent.includes('Upload') || btn.textContent.includes('Add')) {
-      btn.addEventListener('click', function(){
-        });
-    }
-  });
-
-  // Form selects
-  document.querySelectorAll('select').forEach(select => {
-    select.addEventListener('change', function(){
-      });
   });
 
   // Text inputs with auto-complete
@@ -278,61 +318,83 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
-  // Brand link
-  document.querySelector('.brand')?.addEventListener('click', function(){
-    });
+  initGpsMap();
 });
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-  const sidebarItems = document.querySelectorAll(".sidebar-item[onclick]");
-  sidebarItems.forEach(item => {
-    item.addEventListener("click", function(e){
-      const onclickAttr = this.getAttribute("onclick");
-      if(onclickAttr       <div style="position:fixed; bottom:20px; right:20px; text-align:center; background:#f0f0f0; padding:10px 15px; border-radius:6px; font-size:11px; color:#666;">
-        <div style="margin-bottom:8px;"><strong>Demo Flow:</strong></div>
-        <div style="font-size:10px; line-height:1.4;">
-          1. <a href="login-mockup.html" style="color:#BB5B2C; text-decoration:none;">Login</a><br>
-          2. <a href="dashboard-mockup.html" style="color:#BB5B2C; text-decoration:none;">Dashboard</a><br>
-          3. <a href="equipment-mockup.html" style="color:#BB5B2C; text-decoration:none;">Equipment</a><br>
-          4. <a href="module-categories-mockup.html" style="color:#BB5B2C; text-decoration:none;">Modules</a><br>
-          5. <a href="create-equipment-form.html" style="color:#BB5B2C; text-decoration:none;">Create Equipment</a><br>
-          6. <a href="company-settings-mockup.html" style="color:#BB5B2C; text-decoration:none;">Company Settings</a>
-        </div>
-      </div>
-</body></body> onclickAttr.includes("nav(")) {
-        const urlMatch = onclickAttr.match(/nav('([^']+)')/);
-        if(urlMatch       <div style="position:fixed; bottom:20px; right:20px; text-align:center; background:#f0f0f0; padding:10px 15px; border-radius:6px; font-size:11px; color:#666;">
-        <div style="margin-bottom:8px;"><strong>Demo Flow:</strong></div>
-        <div style="font-size:10px; line-height:1.4;">
-          1. <a href="login-mockup.html" style="color:#BB5B2C; text-decoration:none;">Login</a><br>
-          2. <a href="dashboard-mockup.html" style="color:#BB5B2C; text-decoration:none;">Dashboard</a><br>
-          3. <a href="equipment-mockup.html" style="color:#BB5B2C; text-decoration:none;">Equipment</a><br>
-          4. <a href="module-categories-mockup.html" style="color:#BB5B2C; text-decoration:none;">Modules</a><br>
-          5. <a href="create-equipment-form.html" style="color:#BB5B2C; text-decoration:none;">Create Equipment</a><br>
-          6. <a href="company-settings-mockup.html" style="color:#BB5B2C; text-decoration:none;">Company Settings</a>
-        </div>
-      </div>
-</body></body> urlMatch[1]) {
-          const url = urlMatch[1];
-          window.location.href = url;
-        }
-      }
-    });
+
+let gpsMarker = null;
+const demoGpsLocations = [
+  {lat: 12.9716, lng: 77.5946, name: 'Bengaluru, India'},
+  {lat: 28.6139, lng: 77.2090, name: 'New Delhi, India'},
+  {lat: 19.0760, lng: 72.8777, name: 'Mumbai, India'},
+  {lat: 25.2048, lng: 55.2708, name: 'Dubai, UAE'},
+  {lat: 1.3521, lng: 103.8198, name: 'Singapore'},
+  {lat: 35.6762, lng: 139.6503, name: 'Tokyo, Japan'},
+  {lat: 37.5665, lng: 126.9780, name: 'Seoul, South Korea'},
+  {lat: 51.5074, lng: -0.1278, name: 'London, UK'},
+  {lat: 48.8566, lng: 2.3522, name: 'Paris, France'},
+  {lat: 52.5200, lng: 13.4050, name: 'Berlin, Germany'},
+  {lat: 40.7128, lng: -74.0060, name: 'New York, USA'},
+  {lat: 34.0522, lng: -118.2437, name: 'Los Angeles, USA'},
+  {lat: 41.8781, lng: -87.6298, name: 'Chicago, USA'},
+  {lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia'},
+  {lat: -37.8136, lng: 144.9631, name: 'Melbourne, Australia'},
+  {lat: -1.2921, lng: 36.8219, name: 'Nairobi, Kenya'},
+  {lat: -23.5505, lng: -46.6333, name: 'São Paulo, Brazil'},
+  {lat: 19.4326, lng: -99.1332, name: 'Mexico City, Mexico'},
+  {lat: 43.6532, lng: -79.3832, name: 'Toronto, Canada'},
+  {lat: 31.2304, lng: 121.4737, name: 'Shanghai, China'}
+];
+
+function getRandomGpsLocation() {
+  return demoGpsLocations[Math.floor(Math.random() * demoGpsLocations.length)];
+}
+
+function showRandomGpsLocation() {
+  if (!gpsMap) initGpsMap();
+  if (!gpsMap) return;
+  const input = document.querySelector('#gps-tracking-tab input[type="text"]');
+  const imei = input ? input.value.trim() : '';
+  if (!imei) {
+    alert('Please enter a GPS IMEI number.');
+    if (input) input.focus();
+    return;
+  }
+  const location = getRandomGpsLocation();
+  if (gpsMarker) gpsMap.removeLayer(gpsMarker);
+  const pinIcon = L.divIcon({className: '', html: '<div class="gps-pin"></div>', iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -32]});
+  gpsMarker = L.marker([location.lat, location.lng], {icon: pinIcon, title: 'Equipment GPS location'}).addTo(gpsMap);
+  gpsMarker.bindPopup('<div class="gps-popup-title">GPS Location</div><div>IMEI: ' + escapeHtml(imei) + '</div><div>' + location.name + '</div>').openPopup();
+  gpsMap.flyTo([location.lat, location.lng], 6, {animate: true, duration: 1.2});
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+let gpsMap = null;
+
+function initGpsMap() {
+  const el = document.getElementById('gpsMap');
+  if (!el || gpsMap) return;
+  gpsMap = L.map(el, {center: [20, 0], zoom: 3, minZoom: 1, maxZoom: 19, zoomControl: true, worldCopyJump: false, attributionControl: true});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, noWrap: true, attribution: '&copy; OpenStreetMap contributors'}).addTo(gpsMap);
+  gpsMap.setMaxBounds([[-85, -180], [85, 180]]);
+  gpsMap.options.maxBoundsViscosity = 1.0;
+  gpsMap.whenReady(function () {
+    el.classList.add('loaded');
+    gpsMap.invalidateSize(true);
+    gpsMap.setView([20, 0], 3, {animate:false});
   });
-});
+}
+
+function resizeGpsMap() {
+  if (!gpsMap) initGpsMap();
+  if (gpsMap) {
+    setTimeout(() => gpsMap.invalidateSize(true), 50);
+    setTimeout(() => gpsMap.invalidateSize(true), 300);
+  }
+}
 </script>
-      <div style="position:fixed; bottom:20px; right:20px; text-align:center; background:#f0f0f0; padding:10px 15px; border-radius:6px; font-size:11px; color:#666;">
-        <div style="margin-bottom:8px;"><strong>Demo Flow:</strong></div>
-        <div style="font-size:10px; line-height:1.4;">
-          1. <a href="login-mockup.html" style="color:#BB5B2C; text-decoration:none;">Login</a><br>
-          2. <a href="dashboard-mockup.html" style="color:#BB5B2C; text-decoration:none;">Dashboard</a><br>
-          3. <a href="equipment-mockup.html" style="color:#BB5B2C; text-decoration:none;">Equipment</a><br>
-          4. <a href="module-categories-mockup.html" style="color:#BB5B2C; text-decoration:none;">Modules</a><br>
-          5. <a href="create-equipment-form.html" style="color:#BB5B2C; text-decoration:none;">Create Equipment</a><br>
-          6. <a href="company-settings-mockup.html" style="color:#BB5B2C; text-decoration:none;">Company Settings</a>
-        </div>
-      </div>
 </body>
 </html>
 
